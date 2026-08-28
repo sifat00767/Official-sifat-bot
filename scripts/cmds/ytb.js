@@ -1,14 +1,15 @@
 const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
+const yts = require("yt-search");
 
 module.exports = {
   config: {
     name: "ytb",
     aliases: ["youtube", "yt", "ytb2"],
-    version: "3.0",
-    author: "Siyam Hasan (API Fixed)",
-    countDown: 6,
+    version: "4.0",
+    author: "Siyam Hasan (Direct Scraping)",
+    countDown: 5,
     role: 0,
     description: {
       bn: "YouTube ভিডিও সার্চ ও ডাউনলোড (ytb থাম্বনেইল সহ, ytb2 থাম্বনেইল ছাড়া)",
@@ -38,16 +39,9 @@ module.exports = {
     try {
       api.setMessageReaction("🔎", messageID, () => {}, true);
 
-      // Stable Working Search API
-      const searchUrl = `https://api.vyt.workers.dev/search?q=${encodeURIComponent(input)}`;
-      let searchRes;
-      try {
-        searchRes = await axios.get(searchUrl);
-      } catch {
-        searchRes = await axios.get(`https://saiko-api.vercel.app/api/ytsearch?q=${encodeURIComponent(input)}`);
-      }
-
-      const results = (searchRes.data?.results || searchRes.data || []).slice(0, 6);
+      // Direct Scraping with yt-search package (No external API dependancy for search)
+      const searchResult = await yts(input);
+      const results = searchResult.videos.slice(0, 6);
 
       if (!results || !results.length) {
         return api.sendMessage(getLang("noResult", input), threadID, messageID);
@@ -63,7 +57,7 @@ module.exports = {
         const thumbs = await Promise.all(
           results.map(async (r, i) => {
             try {
-              const thumbUrl = r.thumbnail || r.videoThumbnails?.[0]?.url || `https://i.ytimg.com/vi/${r.videoId || r.id}/hqdefault.jpg`;
+              const thumbUrl = r.thumbnail || r.image;
               if (!thumbUrl) return null;
               
               const thumbPath = path.join(cacheDir, `thumb_${senderID}_${Date.now()}_${i}.jpg`);
@@ -79,11 +73,8 @@ module.exports = {
       }
 
       const formattedResults = results.map((r, i) => {
-        const title = r.title || "YouTube Video";
-        const time = r.lengthText || r.duration || "N/A";
-        const id = r.videoId || r.id;
-        msg += `${i + 1}. ${title}\n⏱ ${time}\n\n`;
-        return { id, title };
+        msg += `${i + 1}. ${r.title}\n⏱ ${r.timestamp}\n\n`;
+        return { id: r.videoId, title: r.title, url: r.url };
       });
 
       return api.sendMessage(
@@ -105,7 +96,7 @@ module.exports = {
       );
 
     } catch (e) {
-      return api.sendMessage(`❌ API সমস্যা: ${e.message}`, threadID, messageID);
+      return api.sendMessage(`❌ সার্চে সমস্যা: ${e.message}`, threadID, messageID);
     }
   },
 
@@ -117,8 +108,9 @@ module.exports = {
     const choice = parseInt(event.body);
     if (!choice || choice < 1 || choice > results.length) return;
 
-    const videoID = results[choice - 1].id;
-    const title = results[choice - 1].title;
+    const videoData = results[choice - 1];
+    const videoUrl = videoData.url;
+    const title = videoData.title;
 
     try {
       api.setMessageReaction("⏳", event.messageID, () => {}, true);
@@ -127,17 +119,43 @@ module.exports = {
         if (menuMsgID) api.unsendMessage(menuMsgID);
       } catch {}
 
-      // Stable Third-Party Downloader API Backend
       let downloadLink = null;
+
+      // 🔄 Downloader Multi-Fallback Logic (4 Alternative Engines)
+      
+      // Engine 1: David Cyril Tech API
       try {
-        const res = await axios.get(`https://api.davidcyriltech.my.id/download/ytmp4?url=https://www.youtube.com/watch?v=${videoID}`);
-        downloadLink = res.data?.result?.url || res.data?.result?.download_url;
-      } catch {
-        const fallbackRes = await axios.get(`https://api.guruapi.tech/ytmp4?url=https://www.youtube.com/watch?v=${videoID}`);
-        downloadLink = fallbackRes.data?.url;
+        const res1 = await axios.get(`https://api.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(videoUrl)}`);
+        downloadLink = res1.data?.result?.url || res1.data?.result?.download_url;
+      } catch (e) {}
+
+      // Engine 2: Ytdl / Guru API
+      if (!downloadLink) {
+        try {
+          const res2 = await axios.get(`https://api.guruapi.tech/ytmp4?url=${encodeURIComponent(videoUrl)}`);
+          downloadLink = res2.data?.url;
+        } catch (e) {}
       }
 
-      if (!downloadLink) throw new Error("ভিডিও ডাউনলোডের জন্য পাবলিক API লিংক তৈরি করতে ব্যর্থ হয়েছে।");
+      // Engine 3: Dark Ytdl API
+      if (!downloadLink) {
+        try {
+          const res3 = await axios.get(`https://dark-ytdl-api.vercel.app/download?url=${encodeURIComponent(videoUrl)}`);
+          downloadLink = res3.data?.url;
+        } catch (e) {}
+      }
+
+      // Engine 4: BK9 API
+      if (!downloadLink) {
+        try {
+          const res4 = await axios.get(`https://bk9.fun/download/youtube?url=${encodeURIComponent(videoUrl)}`);
+          downloadLink = res4.data?.BK9?.list?.[0]?.url || res4.data?.BK9?.url;
+        } catch (e) {}
+      }
+
+      if (!downloadLink) {
+        throw new Error("সবগুলো ডাউনলোড সার্ভার ব্যস্ত আছে! কিছুক্ষণ পর আবার চেষ্টা করুন।");
+      }
 
       const filePath = path.join(__dirname, "cache", `yt_${Date.now()}.mp4`);
 
@@ -145,7 +163,7 @@ module.exports = {
         url: downloadLink,
         method: "GET",
         responseType: "stream",
-        timeout: 120000
+        timeout: 180000
       });
 
       const writer = fs.createWriteStream(filePath);
@@ -168,11 +186,11 @@ module.exports = {
       });
 
       writer.on("error", () => {
-        api.sendMessage("❌ ফাইল সেভ করতে সমস্যা হয়েছে", event.threadID);
+        api.sendMessage("❌ ভিডিও ফাইল সেভ করতে সমস্যা হয়েছে।", event.threadID);
       });
 
     } catch (e) {
-      api.sendMessage(`❌ ডাউনলোডে সমস্যা হয়েছে: ${e.message}`, event.threadID, event.messageID);
+      api.sendMessage(`❌ ডাউনলোডে সমস্যা: ${e.message}`, event.threadID, event.messageID);
     }
   }
 };
