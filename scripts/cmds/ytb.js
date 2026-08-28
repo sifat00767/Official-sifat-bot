@@ -2,13 +2,14 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 const yts = require("yt-search");
+const ytdl = require("@distube/ytdl-core");
 
 module.exports = {
   config: {
     name: "ytb",
     aliases: ["youtube", "yt", "ytb2"],
-    version: "4.0",
-    author: "Siyam Hasan (Direct Scraping)",
+    version: "5.0",
+    author: "Siyam Hasan (No-API Direct Stream)",
     countDown: 5,
     role: 0,
     description: {
@@ -39,7 +40,6 @@ module.exports = {
     try {
       api.setMessageReaction("🔎", messageID, () => {}, true);
 
-      // Direct Scraping with yt-search package (No external API dependancy for search)
       const searchResult = await yts(input);
       const results = searchResult.videos.slice(0, 6);
 
@@ -119,55 +119,16 @@ module.exports = {
         if (menuMsgID) api.unsendMessage(menuMsgID);
       } catch {}
 
-      let downloadLink = null;
-
-      // 🔄 Downloader Multi-Fallback Logic (4 Alternative Engines)
-      
-      // Engine 1: David Cyril Tech API
-      try {
-        const res1 = await axios.get(`https://api.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(videoUrl)}`);
-        downloadLink = res1.data?.result?.url || res1.data?.result?.download_url;
-      } catch (e) {}
-
-      // Engine 2: Ytdl / Guru API
-      if (!downloadLink) {
-        try {
-          const res2 = await axios.get(`https://api.guruapi.tech/ytmp4?url=${encodeURIComponent(videoUrl)}`);
-          downloadLink = res2.data?.url;
-        } catch (e) {}
-      }
-
-      // Engine 3: Dark Ytdl API
-      if (!downloadLink) {
-        try {
-          const res3 = await axios.get(`https://dark-ytdl-api.vercel.app/download?url=${encodeURIComponent(videoUrl)}`);
-          downloadLink = res3.data?.url;
-        } catch (e) {}
-      }
-
-      // Engine 4: BK9 API
-      if (!downloadLink) {
-        try {
-          const res4 = await axios.get(`https://bk9.fun/download/youtube?url=${encodeURIComponent(videoUrl)}`);
-          downloadLink = res4.data?.BK9?.list?.[0]?.url || res4.data?.BK9?.url;
-        } catch (e) {}
-      }
-
-      if (!downloadLink) {
-        throw new Error("সবগুলো ডাউনলোড সার্ভার ব্যস্ত আছে! কিছুক্ষণ পর আবার চেষ্টা করুন।");
-      }
-
       const filePath = path.join(__dirname, "cache", `yt_${Date.now()}.mp4`);
 
-      const response = await axios({
-        url: downloadLink,
-        method: "GET",
-        responseType: "stream",
-        timeout: 180000
+      // Direct Stream Download using ytdl-core (No External Download API needed)
+      const stream = ytdl(videoUrl, {
+        quality: "lowestvideo", // 360p/480p standard for messenger limits
+        filter: "audioandvideo"
       });
 
       const writer = fs.createWriteStream(filePath);
-      response.data.pipe(writer);
+      stream.pipe(writer);
 
       writer.on("finish", () => {
         api.sendMessage(
@@ -185,8 +146,8 @@ module.exports = {
         );
       });
 
-      writer.on("error", () => {
-        api.sendMessage("❌ ভিডিও ফাইল সেভ করতে সমস্যা হয়েছে।", event.threadID);
+      writer.on("error", (err) => {
+        api.sendMessage(`❌ স্ট্রিম ডাউনলোডে সমস্যা: ${err.message}`, event.threadID);
       });
 
     } catch (e) {
