@@ -2,9 +2,9 @@ module.exports = {
   config: {
     name: "tod",
     aliases: ["truthordare", "td"],
-    version: "2.0",
+    version: "2.1",
     author: "Sifat",
-    countDown: 5,
+    countDown: 3,
     role: 0,
     description: {
       bn: "মেসেঞ্জার গ্রুপের জন্য হার্ডকোর Truth or Dare ও Bot Mode গেম",
@@ -54,7 +54,7 @@ module.exports = {
       (err, info) => {
         if (err) return;
         global.GoatBot.onReply.set(info.messageID, {
-          commandName: this.config.name,
+          commandName: "tod",
           author: senderID,
           menuMsgID: info.messageID
         });
@@ -66,9 +66,11 @@ module.exports = {
   onReply: async function ({ event, api, Reply }) {
     const { author, menuMsgID } = Reply;
 
+    // শুধুমাত্র যে কমান্ড দিয়েছে সে-ই রিপ্লাই দিতে পারবে
     if (event.senderID !== author) return;
 
-    const choice = event.body.trim();
+    if (!event.body) return;
+    const choice = event.body.trim().toLowerCase();
 
     // 🟢 Hardcore Truth Database
     const truths = [
@@ -97,14 +99,14 @@ module.exports = {
     let resultText = "";
     let type = "";
 
-    if (choice === "1" || choice === "১") {
+    if (choice === "1" || choice === "১" || choice === "truth") {
       type = "🟢 𝗧𝗥𝗨𝗧𝗛";
       resultText = truths[Math.floor(Math.random() * truths.length)];
-    } else if (choice === "2" || choice === "২") {
+    } else if (choice === "2" || choice === "২" || choice === "dare") {
       type = "🔴 𝗗𝗔𝗥𝗘";
       resultText = dares[Math.floor(Math.random() * dares.length)];
     } else {
-      return api.sendMessage("❌ দয়া করে ১ অথবা ২ লিখে রিপ্লাই করো।", event.threadID, event.messageID);
+      return api.sendMessage("❌ দয়া করে ১ অথবা ২ লিখে মেসেজটি রিপ্লাই করো।", event.threadID, event.messageID);
     }
 
     try {
@@ -115,6 +117,7 @@ module.exports = {
 
     api.sendMessage(finalMsg, event.threadID, event.messageID);
 
-    global.GoatBot.onReply.delete(event.messageID);
+    // কাজ শেষ হলে ক্যাশ ক্লিয়ার
+    global.GoatBot.onReply.delete(Reply.menuMsgID);
   }
 };
