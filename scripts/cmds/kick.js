@@ -4,7 +4,7 @@ const path = require("path");
 module.exports = {
 	config: {
 		name: "kick",
-		version: "2.3",
+		version: "2.4",
 		author: "FARHAN-KHAN",
 		countDown: 5,
 		role: 1,
@@ -22,7 +22,7 @@ module.exports = {
 			needAdmin: "বোটকে আগে গ্রুপের এডমিন বানান, নাহলে আমি কাউকে বের করতে পারবো না! ⚠️",
 			noTarget: "যাকে বের করবেন তাকে মেনশন দিন অথবা তার মেসেজে রিপ্লাই দিন। 🧐",
 			adminKick: "🛡️সিয়াম বস📂, 💁গ্রুপ এডমিন 🤔তোমার 🥵ধ*ন চু*সা 🦵কামলা হিসাবে রাইখা দাও😂! ❌",
-			error: "🫶সিয়াম বস🛡️ বের করতে समस्या হচ্ছে😔। হয়তো আমার পারমিশন নেই🤧 বা ইউজারটি গ্রুপে নেই। ⚠️"
+			error: "🫶সিয়াম বস🛡️ বের করতে সমস্যা হচ্ছে😔। হয়তো আমার পারমিশন নেই🤧 বা ইউজারটি গ্রুপে নেই। ⚠️"
 		}
 	},
 
@@ -56,30 +56,59 @@ module.exports = {
 			}
 
 			const reason = args.slice(reasonIndex).join(" ") || "𝑵𝒐 𝑹𝒆𝒂𝒔𝒐𝒏 𝑾𝒂𝒔 𝑮𝒊𝒗𝒆𝒏";
-			const targetName = await usersData.getName(targetID);
-			const actionByName = await usersData.getName(senderID);
+
+			// 🛠️ FIX FOR NULL NAME:
+			// ১. প্রথমে usersData থেকে চেষ্টা করবে
+			// ২. null আসলে ফেসবুক API থেকে নাম আনবে
+			// ৩. মেনশন করা থাকলে মেনশন থেকেও নাম বের করবে
+			let targetName = await usersData.getName(targetID);
+			
+			if (!targetName || targetName === "null" || targetName === "Facebook User") {
+				if (mentions[targetID]) {
+					targetName = mentions[targetID].replace("@", "");
+				} else {
+					try {
+						const userInfo = await api.getUserInfo(targetID);
+						if (userInfo[targetID]) {
+							targetName = userInfo[targetID].name;
+						}
+					} catch (e) {
+						targetName = "Facebook User";
+					}
+				}
+			}
+
+			// Action By (যিনি কমান্ড ব্যবহার করেছেন তার নাম)
+			let actionByName = await usersData.getName(senderID);
+			if (!actionByName || actionByName === "null") {
+				try {
+					const senderInfo = await api.getUserInfo(senderID);
+					actionByName = senderInfo[senderID]?.name || "Admin";
+				} catch (e) {
+					actionByName = "Admin";
+				}
+			}
 
 			const filePath = path.join(__dirname, "kick_log.txt");
 			const timeNow = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
 
 			const statusText = "𝑹𝒆𝒎𝒐𝒗𝒊𝒏𝒈 𝑭𝒓𝒐𝒎 2 𝑺𝒆𝒄𝒐𝒏𝒅...";
 
-			// হেডারে ১টি \n এবং বাকিগুলোতে ২টি \n ব্যবহার করা হয়েছে
 			const responseMsg = 
 				`━━━━━━━♡❤️♡━━━━━━━\n` +
 				`🛑 ⏤͟͟͞͞𝑷𝒂𝒓𝒎𝒂𝒏𝒆𝒏𝒕 𝑲𝒊𝒄𝒌 🛑\n` +
-				`━━━━━━━♡❤️♡━━━━━━━\n\n` +
+				`━━━━━━━♡❤️♡━━━━━━━\n` +
 				`👤 ⏤͟͟͞͞𝑵𝒂𝒎𝒆 : ${targetName}\n\n` +
 				`🆔 ⏤͟͟͞͞𝑼𝒊𝒅 : ${targetID}\n\n` +
-				`📝 ⏤͟͟͞͞𝑹𝒆𝒂𝒔𝒐𝒏 : 𝑵𝒐 𝑹𝒆𝒂𝒔𝒐𝒏 𝑾𝒂𝒔 𝒈𝒊𝒗𝒆𝒏\n\n` +
+				`📝 ⏤͟͟͞͞𝑹𝒆𝒂𝒔𝒐𝒏 : 𝑵𝒐 𝒓𝒆𝒂𝒔𝒐𝒏 𝒘𝒂𝒔 𝒈𝒊𝒗𝒆𝒏\n\n` +
 				`👑 ⏤͟͟͞͞𝑨𝒄𝒕𝒊𝒐𝒏 𝒃𝒚 : 𝑩𝒐𝒕 𝑨𝒅𝒎𝒊𝒏\n\n` +
-				`⚡ ⏤͟͟͞͞𝑺𝒕𝒂𝒕𝒖𝒔 : 𝑹𝒆𝒎𝒐𝒗𝒊𝒏𝒈 𝑭𝒓𝒐𝒎 𝒈𝒓𝒐𝒖𝒑 𝒊𝒏 2 𝒔𝒆𝒄𝒐𝒏𝒅...\n` +
-				`━━━━━━━♡❤️♡━━━━━━━`;
+				`⚡ ⏤͟͟͞͞𝑺𝒕𝒂𝒕𝒖𝒔 : 𝑹𝒆𝒎𝒐𝒗𝒊𝒏𝒈 𝑭𝒓𝒐𝒎 𝑮𝒓𝒐𝒖𝒑 𝑰𝒏 2 𝑺𝒆𝒄𝒐𝒏𝒅...\n` +
+				`━━━━━━━━━━♡❤️♡━━━━━━━━━━`;
 
-			// আগে চ্যাটে মেসেজ পাঠাবে
+			// আগে মেসেজ পাঠাবে
 			await message.reply(responseMsg);
 
-			// তারপর ইউজারকে গ্রুপ থেকে কিক করে ফাইল লগ সেভ করবে
+			// তারপর ইউজারকে রিমুভ করে ফাইল লগ রাখবে
 			api.removeUserFromGroup(targetID, threadID, async (err) => {
 				let logStatus = "Success";
 
