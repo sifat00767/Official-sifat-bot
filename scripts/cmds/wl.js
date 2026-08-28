@@ -122,18 +122,7 @@ module.exports = {
 				const date = moment().tz("Asia/Dhaka").format("DD MMMM YYYY");
 
 				const msg = `
-👑  𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍  👑
-
-𝆠፝𝐖𝐇𝐈𝐓𝐄 𝐋𝐈𝐒𝐓 𝐌𝐎𝐃𝐄 𝐄𝐍𝐀𝐁𝐋𝐄𝐃
-
-🔐  𝆠፝𝐀𝐂𝐂𝐄𝐒𝐒 :
-   𝆠፝🐸এখন শুধু আমার বস সিয়াম🪬
-   𝆠፝বট ব্যবহার করতে পারবে 👑
-
-📅  𝆠፝𝐃𝐚𝐭𝐞 : ${date}
-⏰  𝆠፝𝐓𝐢𝐦𝐞 : ${time}
-
-👑  𝆠፝𝐍𝐈𝐉𝐇𝐔𝐌 𝐂𝐇𝐀𝐓 𝐁𝐎𝐓  👑
+   ⏤͟͟͞͞𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒅𝒆 𝑬𝒏𝒂𝒃𝒍𝒆 ✅
 `;
 
 				return message.reply(msg);
@@ -148,18 +137,8 @@ module.exports = {
 				const date = moment().tz("Asia/Dhaka").format("DD MMMM YYYY");
 
 				const msg = `
-👑  𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍  👑
+⏤͟͟͞͞𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒐𝒅 𝑫𝒊𝒔𝒂𝒃𝒍𝒆𝒅 ❎
 
-𝆠፝𝐖𝐇𝐈𝐓𝐄 𝐋𝐈𝐒𝐓 𝐌𝐎𝐃𝐄 𝐃𝐈𝐒𝐀𝐁𝐋𝐄𝐃
-
-🌐  𝆠፝𝐀𝐂𝐂𝐄𝐒𝐒 :
-   𝆠፝এখন সবাই বট ব্যবহার🪬
-   𝆠፝করতে পারবে 🎉
-
-📅  𝆠፝𝐃𝐚𝐭𝐞 : ${date}
-⏰  𝆠፝𝐓𝐢𝐦𝐞 : ${time}
-
-👑  𝆠፝𝐍𝐈𝐉𝐇𝐔𝐌 𝐂𝐇𝐀𝐓 𝐁𝐎𝐓  👑
 `;
 
 				return message.reply(msg);
