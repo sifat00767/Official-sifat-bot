@@ -8,7 +8,7 @@ module.exports = {
     version: "3.0.0",
     author: "𝐒𝐈𝐘𝐀𝐌",
     countDown: 2,
-    role: 0,
+    role: 2, // 🔒 Strictly Bot Admin Only (গ্রুপ এডমিনরাও এক্সেস পাবে না)
     shortDescription: "Official GitHub Fork",
     category: "utils",
     guide: {
@@ -34,14 +34,12 @@ module.exports = {
 
     api.sendTypingIndicator(threadID, false);
 
-    
     const threadInfo = await api.getThreadInfo(threadID);
     const uptime = process.uptime();
     const hours = Math.floor(uptime / 3600);
     const minutes = Math.floor((uptime % 3600) / 60);
     const ping = Date.now() - event.timestamp;
 
-    
     if (global.forkCounter[threadID] === undefined) {
       global.forkCounter[threadID] = 0;
     } else {
@@ -51,7 +49,6 @@ module.exports = {
     const currentDesign = global.forkCounter[threadID];
     let card = "";
 
-    
     if (currentDesign === 0) {
       card = `〔 👑  𝗚𝗢𝗔𝗧 𝗕𝗢𝗧 𝗩𝟱 👑 〕
 │ 👤 𝗕𝗼𝘁: 𝗚𝗢𝗔𝗧 𝗕𝗢𝗧 𝗩𝟱
@@ -97,10 +94,8 @@ module.exports = {
 »🔗 𝗚𝗜𝗧𝗛𝗨𝗕 : https://github.com/badolvai0O7/BADOL-BOT-V5`;
     }
 
-    
     await message.reply(card);
 
-    
     try {
       if (loadingMsg && loadingMsg.messageID) {
         await api.unsendMessage(loadingMsg.messageID);
@@ -111,6 +106,10 @@ module.exports = {
   onChat: async function ({ api, event, message }) {
     const body = event.body?.trim().toLowerCase();
     if (body === "fork") {
+      // 🔒 Check bot admin before triggering via onChat
+      const adminIDs = global.GoatBot.config.adminBot || [];
+      if (!adminIDs.includes(event.senderID)) return;
+      
       return this.onStart({ api, event, message });
     }
   }
