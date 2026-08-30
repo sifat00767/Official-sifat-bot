@@ -111,34 +111,34 @@ module.exports = {
 ╚═══════🚨═══════╝
 
 👥 @everyone
+» 👥 @everyone
 
-📢 গ্রুপের সকল সদস্যদের দৃষ্টি আকর্ষণ করা যাচ্ছে!
+» 📢 গ্রুপের সকল সদস্যদের দৃষ্টি আকর্ষণ করা যাচ্ছে!
 
-⚠️ সবাই দ্রুত গ্রুপে এক্টিভ হও
-🔥 বস অনলাইনে আছে
-😈 কেউ সিন মেরে পালাইবা না
-
-━━━━━━━━━━━━━━━━━━
-
-⏰ সময় ➤ ${time}
-📅 তারিখ ➤ ${date}
-🌦️ আবহাওয়া ➤ ${weather}
+» ⚠️ সবাই দ্রুত গ্রুপে এক্টিভ হও
+» 🔥 বস অনলাইনে আছে
+» 😈 কেউ সিন মেরে পালাইবা না
 
 ━━━━━━━━━━━━━━━━━━
 
-╔〔 👑 OWNER INFO 👑 〕╗
+» ⏰ সময় ➤ ${time}
+» 📅 তারিখ ➤ ${date}
+» 🌦️ আবহাওয়া ➤ ${weather}
 
-👑 NAME ➤ UDAY HASAN SIYAM
-🏡 LOCATION ➤ KISHOREGANJ, BANGLADESH
-🎂 AGE ➤ 17+
-📚 CLASS ➤ 10
-🏫 SCHOOL ➤ M A MANNAN MANIK HIGH SCHOOL
-💔 STATUS ➤ SINGLE
-⚡ PROFESSION ➤ STUDENT
+━━━━━━━━━━━━━━━━━━
+
+»  OWNER INFO 
+
+» 👑 NAME ➤ SIFAT AHMED
+» 🏡 LOCATION ➤ BOGURA, BANGLADESH
+» 🎂 AGE ➤ 19+
+» 📚 CLASS ➤ 10
+» 💔 STATUS ➤ SINGLE
+» ⚡ PROFESSION ➤ STUDENT
 
 ╚════════════════╝
 
-👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕
 `;
 
 				const mentions = [];
