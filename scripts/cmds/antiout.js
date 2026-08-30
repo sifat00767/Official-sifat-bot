@@ -1,174 +1,190 @@
+const axios = require("axios");
+const fs = require("fs-extra");
+const path = require("path");
+
 module.exports = {
   config: {
     name: "antiout",
-    version: "7.0",
-    author: "FARHAN-KHAN", // 🔒 LOCKED AUTHOR
-    countDown: 5,
+    version: "2.5.0",
+    author: "𝐒𝐈𝐅𝐀𝐓",
+    countDown: 0,
     role: 0,
-    shortDescription: "Enable or disable antiout",
-    longDescription: "",
-    category: "boxchat",
-    guide: "{pn} [on | off]"
+    shortDescription: {
+      en: "Auto re-adds members who leave the group",
+      bn: "গ্রুপ থেকে কেউ লিভ নিলে তাকে অটো রি-এড করে"
+    },
+    longDescription: {
+      en: "Automatically adds back members who leave the group. Re-add status can be toggled per group or globally for all groups. If a user leaves twice, they won't be re-added.",
+      bn: "কেউ লিভ নিলে সাথে সাথে আবার গ্রুপে এড করে দেবে। যদি কোনো ইউজার রি-এড করার পর আবার লিভ নেয়, তবে বট তাকে আর এড না দিয়ে বিদায় মেসেজ দেবে।"
+    },
+    category: "events",
+    guide: {
+      en: "{p}antiout [on/off]\n{p}antiout [on/off] all (Only Bot Admin)\n{p}antiout [অন/অফ]\n{p}antiout [অন/অফ] অল (শুধুমাত্র বট এডমিন)"
+    }
   },
 
-  onStart: async function ({ message, event, threadsData, args }) {
-
-    // 🔒 author lock check
-    if (module.exports.config.author !== "FARHAN-KHAN") return;
-
-    let antiout = await threadsData.get(event.threadID, "settings.antiout");
-
-    if (antiout === undefined) {
-      await threadsData.set(event.threadID, true, "settings.antiout");
-      antiout = true;
-    }
-
-    if (!["on", "off"].includes(args[0])) {
-      return message.reply("বস সিয়াম ডাক দে😜 Use 'on' or 'off' bro!");
-    }
-
-    await threadsData.set(event.threadID, args[0] === "on", "settings.antiout");
-    return message.reply(`😎 Antiout ${args[0] === "on" ? "ENABLED 🔥" : "DISABLED ❌"}`);
+  languages: {
+    vi: {},
+    en: {},
+    bn: {}
   },
 
-  onEvent: async function ({ api, event, threadsData }) {
+  onLoad: async function () {
+    if (!global.antioutReaddCache) {
+      global.antioutReaddCache = new Map();
+    }
+  },
 
-    // 🔒 author lock check
-    if (module.exports.config.author !== "FARHAN-KHAN") return;
+  onStart: async function ({ api, event, args, role, threadsData, message }) {
+    const threadID = event.threadID;
 
-    const antiout = await threadsData.get(event.threadID, "settings.antiout");
-    if (!antiout) return;
+    if (!args[0]) {
+      return message.reply(
+        "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+        "───────────────\n" +
+        "» ⚠️ 𝗨𝗦𝗔𝗚𝗘\n" +
+        "» 📌 /antiout on / off\n" +
+        "» 📌 /antiout অন / অফ\n" +
+        "» 📌 /antiout on all (Bot Admin)\n" +
+        "» 📌 /antiout অন অল (Bot Admin)\n" +
+        "───────────────\n" +
+        "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+      );
+    }
 
-    if (
-      event.logMessageType === "log:unsubscribe" &&
-      event.logMessageData &&
-      event.logMessageData.leftParticipantFbId
-    ) {
+    const subCommand = args[0].toLowerCase();
+    const isAll = args[1] ? args[1].toLowerCase() : "";
 
-      const userId = event.logMessageData.leftParticipantFbId;
-      if (userId == api.getCurrentUserID()) return;
+    try {
+      // Global / All Toggle (On or Off for all threads)
+      if (isAll === "all" || isAll === "অল") {
+        if (role < 2) {
+          return message.reply(
+            "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+            "───────────────\n" +
+            "» ⚠️ _⁠-𝑨𝒄𝒄𝒆𝒔𝒔 𝑫𝒆𝒏𝒊𝒆𝒅\n" +
+            "» ⛔ সব গ্রুপে একসাথে অন/অফ করার ক্ষমতা শুধুমাত্র বট এডমিনের আছে!\n" +
+            "───────────────\n" +
+            "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+          );
+        }
 
-      let leaveData = await threadsData.get(event.threadID, "data.leaveCount") || {};
-      leaveData[userId] = (leaveData[userId] || 0) + 1;
-      await threadsData.set(event.threadID, leaveData, "data.leaveCount");
-
-      if (leaveData[userId] > 5) {
-        return api.sendMessage(
-          `🛑 ${leaveData[userId]} বার পালাইছস! 🤡
-তুই এখন "Escape Legend" 💀🏆
-আর add করা হইবো না! Bye bye 👋
-
-***_Powered by 亗 SIYAM HASAN 亗 ⚡_***`,
-          event.threadID
-        );
+        if (subCommand === "on" || subCommand === "অন") {
+          const allThreads = await threadsData.getAll();
+          for (const thread of allThreads) {
+            await threadsData.set(thread.threadID, true, "data.antioutStatus");
+          }
+          return message.reply(
+            "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+            "───────────────\n" +
+            "» 🛡️ _⁠-𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑨𝒍𝒍 𝑬𝒏𝒂𝒃𝒍𝒆𝒅\n" +
+            "» 🚀 বটের সমস্ত গ্রুপে অ্যান্টিআউট সার্ভিস অন করা হলো!\n" +
+            "───────────────\n" +
+            "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+          );
+        } else if (subCommand === "off" || subCommand === "অফ") {
+          const allThreads = await threadsData.getAll();
+          for (const thread of allThreads) {
+            await threadsData.set(thread.threadID, false, "data.antioutStatus");
+          }
+          return message.reply(
+            "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+            "───────────────\n" +
+            "» 🔓 _⁠-𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑨𝒍𝒍 𝑫𝒊𝒔𝒂𝒃𝒍𝒆𝒅\n" +
+            "» 🚫 বটের সমস্ত গ্রুপে অ্যান্টিআউট সার্ভিস অফ করা হলো!\n" +
+            "───────────────\n" +
+            "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+          );
+        }
       }
 
+      // Specific Thread Toggle (On or Off)
+      if (subCommand === "on" || subCommand === "অন") {
+        await threadsData.set(threadID, true, "data.antioutStatus");
+        return message.reply(
+          "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+          "───────────────\n" +
+          "» 🛡️ _⁠-𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑬𝒏𝒂𝒃𝒍𝒆𝒅\n" +
+          "» ✨ এই গ্রুপের জন্য অ্যান্টিআউট সার্ভিস অন করা হয়েছে!\n" +
+          "───────────────\n" +
+          "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+        );
+      } else if (subCommand === "off" || subCommand === "অফ") {
+        await threadsData.set(threadID, false, "data.antioutStatus");
+        return message.reply(
+          "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+          "───────────────\n" +
+          "» 🔓 _⁠-𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑫𝒊𝒔𝒂𝒃𝒍𝒆𝒅\n" +
+          "» 🚫 এই গ্রুপের জন্য অ্যান্টিআউট সার্ভিস অফ করা হয়েছে!\n" +
+          "───────────────\n" +
+          "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+        );
+      } else {
+        return message.reply(
+          "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
+          "───────────────\n" +
+          "» ⚠️ _⁠-𝑰𝒏𝒗𝒂𝒍𝒊𝒅 𝑶𝒑𝒕𝒊𝒐𝒏\n" +
+          "» 📌 অনুগ্রহ করে 'on'/'off' অথবা 'অন'/'অফ' টাইপ করুন।\n" +
+          "───────────────\n" +
+          "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
+        );
+      }
+    } catch (err) {
+      return message.reply(`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n───────────────\n» ⚠️ _⁠-𝑬𝒓𝒓𝒐𝒓\n» ❌ অন/অফ করতে সমস্যা হয়েছে: ${err.message}\n───────────────\n» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`);
+    }
+  },
+
+  onEvent: async function ({ api, event, usersData, threadsData }) {
+    if (event.logMessageType === "log:unsubscribe") {
+      const { threadID, logMessageData } = event;
+      const leftUserID = logMessageData.leftParticipantFbId;
+
+      // Antiout Status Check
+      const antioutStatus = await threadsData.get(threadID, "data.antioutStatus");
+      if (antioutStatus === false) return;
+
+      // যদি বট নিজেই বের হয়ে যায় বা কিক খায় তবে কাজ করবে না
+      if (leftUserID === api.getCurrentUserID()) return;
+
+      if (!global.antioutReaddCache) {
+        global.antioutReaddCache = new Map();
+      }
+
+      const userKey = `${threadID}_${leftUserID}`;
+      const name = await usersData.getName(leftUserID);
+
+      // ২য় বার লিভ নিয়েছে কিনা চেক
+      if (global.antioutReaddCache.get(userKey)) {
+        api.sendMessage(
+          `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
+          `───────────────\n` +
+          `» 🖐️ 𝑮𝒐𝒐𝒅𝒃𝒚𝒆 ${name} !\n` +
+          `» ⚠️ আপনি আগেও একবার লিভ নিয়েছিলেন এবং আপনাকে ব্যাক আনা হয়েছিল।\n` +
+          `» 🚫 যেহেতু আবারও লিভ নিয়েছেন, আপনাকে আর এই গ্রুপে রি-এড করা হবে না। ভালো থাকবেন!\n` +
+          `───────────────\n` +
+          `» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
+          threadID
+        );
+        return;
+      }
+
+      // ১ম বার লিভ নিলে অটো রি-এড সিস্টেম
       try {
-        await api.addUserToGroup(userId, event.threadID);
-
-        const userInfo = await api.getUserInfo(userId);
-        const userName = userInfo[userId].name;
-
-        if (leaveData[userId] >= 3) {
-          try {
-            await api.changeNickname("Runner Pro 🏃‍♂️🔥", event.threadID, userId);
-          } catch (e) {}
-        }
-
-        if (leaveData[userId] == 4) {
-
-          api.sendMessage(
-            {
-              body: `😏🔥 ${userName} ৪ বার পালাইছস!!
-
-Resume তে লিখবি —
-"Professional Group Leaver – 4 Years Experience" 🤡📄
-
-আর একবার করলে surprise আছে 💀
-
-***_Powered by 亗 SIYAM HASAN 亗 ⚡_***`,
-              mentions: [{
-                tag: userName,
-                id: userId
-              }]
-            },
-            event.threadID
-          );
-
-        } else if (leaveData[userId] == 3) {
-
-          api.sendMessage(
-            {
-              body: `💀 ${userName} আবার পালাইছে!
-
-৩ বার already 🤡
-তুই এখন officially Runner Pro 🏃‍♂️🔥
-
-Security তোর উপর নজর রাখতেছে 👀
-
-***_Powered by 亗 SIYAM HASAN 亗 ⚡_***`,
-              mentions: [{
-                tag: userName,
-                id: userId
-              }]
-            },
-            event.threadID
-          );
-
-        } else if (leaveData[userId] == 5) {
-
-          api.sendMessage(
-            {
-              body: `⚠️ LAST WARNING ${userName}
-
-৫ বার পালাইছস 😈
-আর একবার করলে permanent freedom 😌
-
-Bot watching you 🕵️‍♂️🔥
-
-***_Powered by 亗 SIYAM HASAN 亗 ⚡_***`,
-              mentions: [{
-                tag: userName,
-                id: userId
-              }]
-            },
-            event.threadID
-          );
-
-        } else {
-
-          api.sendMessage(
-            {
-              body: `🚨🔍 FBI ALERT! 🚨
-
-${userName} পালানোর চেষ্টা করছিল 🏃‍♂️💨
-কিন্তু satellite tracking system এ ধরা খাইছে 📡😎
-
-Area 51 level security 🔒👽
-Mission: Re-Added Successfully ✅🔥
-(Leave count: ${leaveData[userId]}/5)
-
-***_Powered by 亗 SIYAM HASAN 亗⚡_***`,
-              mentions: [{
-                tag: userName,
-                id: userId
-              }]
-            },
-            event.threadID
-          );
-
-        }
-
-      } catch (err) {
+        await api.addUserToGroup(leftUserID, threadID);
+        global.antioutReaddCache.set(userKey, true); // ট্র্যাকিং অন
 
         api.sendMessage(
-          `🤡 পালানোর প্ল্যান সফল হইছে মনে হয়ছে! হয়তো ওর লগে আমি এড না অথবা আমাকে বিয়ে করছে 😭
-এইবার বেঁচে গেলি 😏
-
-***_Powered by 亗 SIYAM HASAN 亗 ⚡_***`,
-          event.threadID
+          `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
+          `───────────────\n` +
+          `» ⚠️ 𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑨𝒍𝒆𝒓𝒕 !\n` +
+          `» 📌 ${name} গ্রুপ থেকে লিভ নেওয়ার চেষ্টা করেছিলেন।\n` +
+          `» 🛡️ অ্যান্টিআউট অন থাকায় আপনাকে পুনরায় এড করে দেওয়া হলো!\n` +
+          `───────────────\n` +
+          `» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
+          threadID
         );
-
+      } catch (e) {
+        console.error("Antiout Re-add Error:", e);
       }
     }
   }
