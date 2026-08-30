@@ -200,7 +200,7 @@ module.exports = {
       // Message Design
       let msg =
 `╭─❍ 𝐂𝐌𝐃 𝐒𝐓𝐎𝐑𝐄 🎀
-├─👑 Admin: Siyam Hasan
+├─👑 Admin: SIFAT AHMED
 ├─📦 Total Commands: ${finalArray.length}
 ├─📄 Page: ${page}/${totalPages}
 ╰────────────◊
@@ -365,7 +365,7 @@ module.exports = {
       const msg =
 `╭─❍ 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐈𝐍𝐅𝐎
 ├─📌 Name: ${cmdName}
-├─👑 Owner: Siyam Hasan
+├─👑 Owner: SIFAT AHMED
 ├─🔗 URL:
 ${selectedCmdUrl}
 ╰────────────◊`;
