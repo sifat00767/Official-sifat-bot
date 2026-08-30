@@ -21,7 +21,7 @@ module.exports.onStart = async function ({ api, event, Users }) {
   let footer =
     "\n━━━━━━━━━━━━━━━━\n" +
     "👑 BOT OWNER\n" +
-    "𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍\n" +
+    "𝐒𝐈𝐅𝐀𝐓-𝐀𝐇𝐌𝐄𝐃\n" +
     "━━━━━━━━━━━━━━━━";
 
   let chunks = [];
@@ -47,11 +47,11 @@ module.exports.onStart = async function ({ api, event, Users }) {
     }
 
     let line =
-      `╭─❖👤 USER #${count}\n` +
-      `│ ✦ Name: ${name}\n` +
-      `│ 🆔 UID: ${uid}\n` +
-      `│ 🔗 Link: https://facebook.com/${uid}\n` +
-      `╰───────────────\n\n`;
+      `» 👤 USER #${count}\n` +
+      `» ✦ Name: ${name}\n` +
+      `» 🆔 UID: ${uid}\n` +
+      `» 🔗 Link: https://facebook.com/${uid}\n` +
+      `───────────────\n\n`;
 
     // যদি বেশি বড় হয়ে যায় তাহলে নতুন chunk
     if ((msg + line).length > 1800) {
