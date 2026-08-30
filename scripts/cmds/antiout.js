@@ -5,7 +5,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: "antiout",
-    version: "2.5.0",
+    version: "2.6.0",
     author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 0,
     role: 0,
@@ -15,7 +15,7 @@ module.exports = {
     },
     longDescription: {
       en: "Automatically adds back members who leave the group. Re-add status can be toggled per group or globally for all groups. If a user leaves twice, they won't be re-added.",
-      bn: "কেউ লিভ নিলে সাথে সাথে আবার গ্রুপে এড করে দেবে। যদি কোনো ইউজার রি-এড করার পর আবার লিভ নেয়, তবে বট তাকে আর এড না দিয়ে বিদায় মেসেজ দেবে।"
+      bn: "কেউ লিভ নিলে সাথে সাথে আবার গ্রুপে এড করে দেবে। যদি কোনো ইউজার রি-এড করার পর আবার লিভ নেয়, তবে বট তাকে আর এড না দিয়ে বিদায় মেসেজ দেবে।"
     },
     category: "events",
     guide: {
@@ -139,11 +139,11 @@ module.exports = {
       const { threadID, logMessageData } = event;
       const leftUserID = logMessageData.leftParticipantFbId;
 
-      // Antiout Status Check
+      // Strict Antiout Status Check (কেবলমাত্র true হলেই কাজ করবে)
       const antioutStatus = await threadsData.get(threadID, "data.antioutStatus");
-      if (antioutStatus === false) return;
+      if (antioutStatus !== true) return;
 
-      // যদি বট নিজেই বের হয়ে যায় বা কিক খায় তবে কাজ করবে না
+      // যদি বট নিজেই বের হয়ে যায় বা কিক খায় তবে কাজ করবে না
       if (leftUserID === api.getCurrentUserID()) return;
 
       if (!global.antioutReaddCache) {
@@ -153,14 +153,14 @@ module.exports = {
       const userKey = `${threadID}_${leftUserID}`;
       const name = await usersData.getName(leftUserID);
 
-      // ২য় বার লিভ নিয়েছে কিনা চেক
+      // ২য় বার লিভ নিয়েছে কিনা চেক
       if (global.antioutReaddCache.get(userKey)) {
         api.sendMessage(
           `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
           `───────────────\n` +
           `» 🖐️ 𝑮𝒐𝒐𝒅𝒃𝒚𝒆 ${name} !\n` +
-          `» ⚠️ আপনি আগেও একবার লিভ নিয়েছিলেন এবং আপনাকে ব্যাক আনা হয়েছিল।\n` +
-          `» 🚫 যেহেতু আবারও লিভ নিয়েছেন, আপনাকে আর এই গ্রুপে রি-এড করা হবে না। ভালো থাকবেন!\n` +
+          `» ⚠️ আপনি আগেও একবার লিভ নিয়েছিলেন এবং আপনাকে ব্যাক আনা হয়েছিল।\n` +
+          `» 🚫 যেহেতু আবারও লিভ নিয়েছেন, আপনাকে আর এই গ্রুপে রি-এড করা হবে না। ভালো থাকবেন!\n` +
           `───────────────\n` +
           `» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
           threadID
@@ -177,8 +177,8 @@ module.exports = {
           `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
           `───────────────\n` +
           `» ⚠️ 𝑨𝒏𝒕𝒊𝒐𝒖𝒕 𝑨𝒍𝒆𝒓𝒕 !\n` +
-          `» 📌 ${name} গ্রুপ থেকে লিভ নেওয়ার চেষ্টা করেছিলেন।\n` +
-          `» 🛡️ অ্যান্টিআউট অন থাকায় আপনাকে পুনরায় এড করে দেওয়া হলো!\n` +
+          `» 📌 ${name} গ্রুপ থেকে লিভ নেওয়ার চেষ্টা করেছিলেন।\n` +
+          `» 🛡️ অ্যান্টিআউট অন থাকায় আপনাকে পুনরায় এড করে দেওয়া হলো!\n` +
           `───────────────\n` +
           `» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
           threadID
