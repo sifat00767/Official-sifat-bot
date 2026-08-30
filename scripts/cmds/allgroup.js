@@ -55,14 +55,10 @@ module.exports = {
       }
 
       let msg =
-`╔𝐑𝐎𝐘𝐀𝐋 𝐆𝐑𝐎𝐔𝐏 𝐏𝐀𝐍𝐄𝐋╗
-┃
-┃ 🌟 𝗔𝗖𝗧𝗜𝗩𝗘 𝗚𝗥𝗢𝗨𝗣 𝗟𝗜𝗦𝗧 🌟
-┃        👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑
-┃
-┃      👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
-┃
-╠═══════════════╣
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+
+» _⁠-𝗔𝗖𝗧𝗜𝗩𝗘 𝗚𝗥𝗢𝗨𝗣 𝗟𝗜𝗦𝗧 
+───────────────
 `;
 
       const saveGroup = [];
@@ -78,35 +74,30 @@ module.exports = {
         const groupName = group.threadName || "Unnamed Group";
 
         msg +=
-`┃ 💎 ${i + 1} ➤ ${groupName}
-┃ 🆔 𝐆𝐂 𝐈𝐃 ➤ ${group.threadID}
-┃ 👥 𝐌𝐄𝐌𝐁𝐄𝐑 ➤ ${activeMembersCount}
-┃
+`» 💎 ${i + 1} ➤ ${groupName}
+» 🆔 𝐆𝐂 𝐈𝐃 ➤ ${group.threadID}
+» 👥 𝐌𝐄𝐌𝐁𝐄𝐑 ➤ ${activeMembersCount}
+»
 `;
 
         saveGroup.push(group.threadID);
       }
 
       msg +=
-`╠══════════════╣
-┃  𝐑𝐄𝐏𝐋𝐘 𝐂𝐎𝐍𝐓𝐑𝐎🇱 𝐏𝐀𝐍𝐄🇱 
-┃
-┃ 🚪 out 1
-┃ ➤ Leave Selected Group
-┃
-┃ ➕ add 2
-┃ ➤ Add Yourself In Group
-┃
-┃ 🚫 ban 3
-┃ ➤ Ban & Auto Leave Group
-┃
-┃  ═══════════════╣
-┃ 🤖 𝐁𝐎𝗧    ➤  𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧 
-┃ 👑 𝐎𝐖𝐍𝗘𝗥    
-┃  ☠️  ➤  𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
-┃ 💠 𝐏𝗥𝗘𝗙𝗜𝗫 ➤ 【,】
-┃
-╚  👑 𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧👑 ╝`;
+`───────────────
+» _⁠-𝐑𝐄𝐏𝐋𝐘 𝐂𝐎𝐍𝐓𝐑𝐎🇱 𝐏𝐀𝐍𝐄🇱 
+
+» 🚪 out 1
+» ➤ Leave Selected Group
+
+» ➕ add 2
+» ➤ Add Yourself In Group
+
+» 🚫 ban 3
+» ➤ Ban & Auto Leave Group
+
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`;
 
       const info = await message.reply(msg);
 
@@ -159,10 +150,12 @@ module.exports = {
         try {
           await api.removeUserFromGroup(api.getCurrentUserID(), threadID);
           return message.reply(
-`╔══════════════╗
-┃ ✅ LEFT SUCCESS
-┃ 🆔 ${threadID}
-╚══════════════╝`
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» ✅ LEFT SUCCESS
+» 🆔 ${threadID}
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`
           );
         } catch {
           return message.reply("❌ Failed to leave group.");
@@ -176,10 +169,12 @@ module.exports = {
         try {
           await api.addUserToGroup(event.senderID, threadID);
           return message.reply(
-`╔══════════════╗
-┃ ✅ ADD SUCCESS
-┃ 🆔 ${threadID}
-╚══════════════╝`
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» ✅ ADD SUCCESS
+» 🆔 ${threadID}
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`
           );
         } catch {
           return message.reply("❌ Failed to add user to group.");
@@ -204,10 +199,12 @@ module.exports = {
           } catch(e) {}
 
           return message.reply(
-`╔══════════════╗
-┃ 🚫 BAN SUCCESS
-┃ 🆔 ${threadID}
-╚══════════════╝`
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» 🚫 BAN SUCCESS
+» 🆔 ${threadID}
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`
           );
         } catch {
           return message.reply("❌ Failed to ban group.");
