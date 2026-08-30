@@ -35,7 +35,7 @@ module.exports = {
       missingNickname: `
 ╔💎𝗡𝗜𝗖𝗞𝗡𝗔𝗠𝗘 𝗘𝗥𝗥𝗢𝗥💎╗
 ┃ ⚠️ নতুন নিকনেম লিখুন
-┃ 📝 উদাহরণ ➤ ,botnick SIYAM BOT
+┃ 📝 উদাহরণ ➤ ,botnick SIFAT BOT
 ╚═════════════════╝
 `,
 
