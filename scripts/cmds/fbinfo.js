@@ -31,15 +31,15 @@ module.exports = {
         user.gender == 2 ? "Male" : "Unknown";
 
       return message.reply(
-`📘 FACEBOOK USER INFO
+`» 📘 FACEBOOK USER INFO
 
-👤 Name: ${user.name || "Unknown"}
-🆔 UID: ${uid}
-👤 Username: ${user.vanity || "Not set"}
-🚻 Gender: ${gender}
-🔗 Profile: https://facebook.com/${uid}
+» 👤 Name: ${user.name || "Unknown"}
+» 🆔 UID: ${uid}
+» 👤 Username: ${user.vanity || "Not set"}
+» 🚻 Gender: ${gender}
+» 🔗 Profile: https://facebook.com/${uid}
 
-─꯭─⃝͎̽𓆩 𝐒𝐈𝐘𝐀𝐌 𝐀𝐑 𝐁𝐎𝐓 ‣ 𝐋𝐄𝐃 𝐌𝐎𝐃𝐄 𓆪`
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`
       );
 
     } catch (err) {
