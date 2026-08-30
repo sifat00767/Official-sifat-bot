@@ -24,11 +24,13 @@ const isFriend = userInfo[senderID].isFriend;
 
 if (isFriend) {
 return api.sendMessage(
-`╭━〔 💎 𝗦𝗜𝗬𝗔𝗠 𝗕𝗢𝗧 〕━╮
-┃ 🌸 হ্যালো ${name} !
-┃ 🤝 তুমি আগেই আমার
-┃ 💖 Friend List এ আছো
-╰━━━━━━━━━━━━━━━╯`, 
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» 🌸 হ্যালো ${name} !
+» 🤝 তুমি আগেই আমার
+» 💖 Friend List এ আছো
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
 threadID, messageID);
 }
 
@@ -49,11 +51,13 @@ const senderRequest = listRequest.find(u => u.node.id == senderID);
 
 if (!senderRequest) {
 return api.sendMessage(
-`╭━〔 🌙 𝗦𝗜𝗬𝗔𝗠 𝗕𝗢𝗧 〕━╮
-┃ 🌸 হেই ${name} !
-┃ ⚠️ তোমার কোনো
-┃ 📥 Pending Request পাইনি
-╰━━━━━━━━━━━━━━━╯`, 
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» 🌸 হেই ${name} !
+» ⚠️ তোমার কোনো
+» 📥 Pending Request পাইনি
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
 threadID, messageID);
 }
 
@@ -79,21 +83,23 @@ const res = await api.httpPost("https://www.facebook.com/api/graphql/", formAcce
 
 if (JSON.parse(res).errors) {
 return api.sendMessage(
-`╭━〔 💔 𝗦𝗜𝗬𝗔𝗠 𝗕𝗢𝗧 〕━╮
-┃ 😔  সরি ${name}
-┃ ⚠️ তোমার Request টি
-┃ ❌ Accept করতে পারিনি
-╰━━━━━━━━━━━━━━━╯`, 
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» 😔  সরি ${name}
+» ⚠️ তোমার Request টি
+» ❌ Accept করতে পারিনি
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
 threadID, messageID);
 } else {
 return api.sendMessage(
-`╔〔 ✅ SIYAM SUCCESS 〕╗
-┃ 🎉 অভিনন্দন ${name}!
-┃ ✔️ তোমার Friend Request
-┃ সফলভাবে Accept করা হয়েছে।
-┃ ──────────────
-┃ 𝗢𝗪𝗡𝗘𝗥 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 🫶 
-╚═══════════════╝`, 
+`» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
+───────────────
+» 🎉 অভিনন্দন ${name}!
+» ✔️ তোমার Friend Request
+» সফলভাবে Accept করা হয়েছে।
+───────────────
+» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
 threadID, messageID);
 }
 
