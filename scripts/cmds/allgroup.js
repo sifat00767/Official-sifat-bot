@@ -3,10 +3,10 @@ module.exports = {
   config: {
     name: "allgroup",
     aliases: ["allgc"],
-    version: "2.5",
+    version: "5.0",
     role: 2, // 🔒 Strictly Bot Admin Only
     author: "亗 SIYAM HASAN 亗",
-    description: "Premium All Group Panel",
+    description: "Premium All Group Panel (Only My Active Facebook Account Groups)",
     category: "admin",
     countDown: 5,
     guide: {
@@ -27,22 +27,37 @@ module.exports = {
   }) {
 
     try {
-      // API Direct Fetch-এর বদলে সেফ ডাটাবেজ ফেচ
+      // বটের ফেসবুক আইডির নিজের ID নেওয়া
+      const botUserID = api.getCurrentUserID();
+
+      // ডাটাবেজ থেকে সমস্ত গ্রুপ ডাটা নিয়ে আসা
       const allThreads = await threadsData.getAll();
 
-      // শুধুমাত্র গ্রুপ লিস্ট ফিল্টার করা (বর্তমান গ্রুপ বাদে)
-      const groups = allThreads.filter(
-        item => item.isGroup && item.threadID != event.threadID
-      );
+      // 🎯 STRICT FILTERING: 
+      // ১. এটি অবশ্যই গ্রুপ হতে হবে
+      // ২. বর্তমান গ্রুপ বাদে বাকিগুলো হতে হবে
+      // ৩. আপনার বটের ফেসবুক আইডিটিকে এই মুহূর্তে ওই গ্রুপের ভেতরে 'inGroup: true' অবস্থায় থাকতে হবে
+      const myActiveGroups = allThreads.filter(thread => {
+        if (!thread.isGroup || thread.threadID == event.threadID) return false;
+        
+        // মেম্বার লিস্টের ভেতর আপনার বট আইডি উপস্থিত ও Active আছে কিনা চেক
+        if (thread.members && Array.isArray(thread.members)) {
+          const isBotInGroup = thread.members.some(
+            m => m.userID === botUserID && m.inGroup === true
+          );
+          return isBotInGroup;
+        }
+        return false;
+      });
 
-      if (!groups || !groups.length) {
-        return message.reply("❌ Bot is not added in any other group.");
+      if (!myActiveGroups || !myActiveGroups.length) {
+        return message.reply("❌ Your Bot account is currently not active in any other group.");
       }
 
       let msg =
 `╔𝐑𝐎𝐘𝐀𝐋 𝐆𝐑𝐎𝐔𝐏 𝐏𝐀𝐍𝐄𝐋╗
 ┃
-┃ 🌟 𝐀𝐋𝐋 𝐆𝐑𝐎𝐔𝐏 𝐋𝐈𝐒𝐓 🌟
+┃ 🌟 𝗔𝗖𝗧𝗜𝗩𝗘 𝗚𝗥𝗢𝗨𝗣 𝗟𝗜𝗦𝗧 🌟
 ┃        👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑
 ┃
 ┃      👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
@@ -52,15 +67,20 @@ module.exports = {
 
       const saveGroup = [];
 
-      for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
-        const name = group.threadName || "Unnamed Group";
-        const members = group.members ? group.members.length : 0;
+      for (let i = 0; i < myActiveGroups.length; i++) {
+        const group = myActiveGroups[i];
+        
+        // কেবল যেসব মেম্বার বর্তমানে গ্রুপে আছে তাদের সংখ্যা গণনা
+        const activeMembersCount = group.members 
+          ? group.members.filter(m => m.inGroup === true).length 
+          : 0;
+
+        const groupName = group.threadName || "Unnamed Group";
 
         msg +=
-`┃ 💎 ${i + 1} ➤ ${name}
+`┃ 💎 ${i + 1} ➤ ${groupName}
 ┃ 🆔 𝐆𝐂 𝐈𝐃 ➤ ${group.threadID}
-┃ 👥 𝐌𝐄𝐌𝐁𝐄𝐑 ➤ ${members}
+┃ 👥 𝐌𝐄𝐌𝐁𝐄𝐑 ➤ ${activeMembersCount}
 ┃
 `;
 
@@ -69,7 +89,7 @@ module.exports = {
 
       msg +=
 `╠══════════════╣
-┃  𝐑𝐄𝐏𝐋𝐘 𝐂𝐎𝐍𝐓𝐑𝐎𝐋 𝐏𝐀𝐍𝐄𝐋 
+┃  𝐑𝐄𝐏𝐋𝐘 𝐂𝐎𝐍𝐓𝐑𝐎🇱 𝐏𝐀𝐍𝐄🇱 
 ┃
 ┃ 🚪 out 1
 ┃ ➤ Leave Selected Group
@@ -81,10 +101,10 @@ module.exports = {
 ┃ ➤ Ban & Auto Leave Group
 ┃
 ┃  ═══════════════╣
-┃ 🤖 𝐁𝐎𝐓    ➤  𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧 
-┃ 👑 𝐎𝐖𝐍𝐄𝐑    
+┃ 🤖 𝐁𝐎𝗧    ➤  𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧 
+┃ 👑 𝐎𝐖𝐍𝗘𝗥    
 ┃  ☠️  ➤  𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
-┃ 💠 𝐏𝐑𝐄𝐅𝐈𝐗 ➤ 【,】
+┃ 💠 𝐏𝗥𝗘𝗙𝗜𝗫 ➤ 【,】
 ┃
 ╚  👑 𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧👑 ╝`;
 
