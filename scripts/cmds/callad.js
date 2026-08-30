@@ -57,7 +57,7 @@ const groupName = isGroup
   : "PRIVATE CHAT";
 
 const body =
-  "╭━━━👑 𝗦𝗜𝗬𝗔𝗠 𝗛𝗔𝗦𝗔𝗡 👑━━━╮\n\n" +
+  "╭━━━👑 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃 👑━━━╮\n\n" +
   "📩 𝗡𝗘𝗪 𝗖𝗔𝗟𝗟\n\n" +
   `👤 𝗡𝗔𝗠𝗘 › ${senderName}\n` +
   `🆔 𝗨𝗜𝗗 › ${senderID}\n` +
