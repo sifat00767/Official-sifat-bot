@@ -38,7 +38,7 @@ module.exports = {
       return global.gcAdminList(api, event, tID);
 
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -53,7 +53,7 @@ module.exports = {
 গ্রুপে কাউকে এডমিন বানাতে চাইলে 'gcadmin add' লিখে মেনশন বা রিপ্লাই করুন। অ্যাডমিনদের তালিকা দেখতে 'gcadminlist' লিখুন এবং তালিকা থেকে বাদ দিতে 'gcremove [নাম্বার]' লিখুন।
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`,
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
       tID
     );
   }
@@ -72,7 +72,7 @@ global.gcAdminList = async function (api, event, tID) {
     }
 
     const userInfo = await api.getUserInfo(adminIDs);
-    let msg = `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑\n\n✦ 𝗚𝗥𝗢𝗨𝗣 𝗔𝗗𝗠𝗜𝗡 𝗟𝗜𝗦𝗧\n\n`;
+    let msg = `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃 👑\n\n✦ 𝗚𝗥𝗢𝗨𝗣 𝗔𝗗𝗠𝗜𝗡 𝗟𝗜𝗦𝗧\n\n`;
     
     const currentAdmins = [];
 
@@ -84,7 +84,7 @@ global.gcAdminList = async function (api, event, tID) {
       index++;
     }
 
-    msg += `\n━━━━━━━━━━━━\n💡 অ্যাডমিন রিমুভ করতে লিখুন:\ngcremove [নাম্বার]\n\n✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`;
+    msg += `\n━━━━━━━━━━━━\n💡 অ্যাডমিন রিমুভ করতে লিখুন:\ngcremove [নাম্বার]\n\n_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`;
     
     // সেশন সেভ করে রাখা হচ্ছে যাতে নাম্বার দিয়ে রিমুভ করা যায়
     global.gcAdminSession[tID] = currentAdmins;
@@ -115,7 +115,7 @@ global.gcRemoveByIndex = async function (api, event, tID, index) {
     global.gcAdminSession[tID].splice(index, 1);
 
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -124,12 +124,12 @@ global.gcRemoveByIndex = async function (api, event, tID, index) {
 👤 ${targetAdmin.name}
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`, 
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
       tID 
     );
   } catch {
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -137,11 +137,11 @@ global.gcRemoveByIndex = async function (api, event, tID, index) {
 ➥ 𝗨𝗻𝗮𝗯𝗹𝗲 𝘁𝗼 𝗥𝗲𝗺𝗼𝘃𝗲 𝗔𝗱𝗺𝗶𝗻
 🔒 🇨🇭𝗲𝗰𝗸 𝗕𝗼𝘁 𝗣𝗲𝗿𝗺𝗶𝘀𝘀𝗶𝗼𝗻
 
-💡 【 👑-𝐒𝐈𝐘𝐀𝐌-👑 】⚠️ এই সদস্যকে Remove করা গেল না!
+💡 𝐒𝐈𝐅𝐀𝐓 ⚠️ এই সদস্যকে Remove করা গেল না!
 🚫 Bot Admin নেই অথবা যাকে Remove করা হচ্ছে তার ক্ষমতা বটের চেয়ে বেশি।
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`,
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
       tID
     );
   }
@@ -156,7 +156,7 @@ async function addAdmin(api, event, tID, target) {
     await api.changeAdminStatus(tID, uID, true);
 
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -165,12 +165,12 @@ async function addAdmin(api, event, tID, target) {
 👤 ${name}
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`, 
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
       tID 
     );
   } catch {
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -181,7 +181,7 @@ async function addAdmin(api, event, tID, target) {
 💡 [ মনে রাখুন ]: বটের এই কমান্ডটি কাজ করার জন্য অবশ্যই বটকে প্রথমে ওই গ্রুপের এডমিন (Admin) বানাতে হবে।
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`,
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
       tID
     );
   }
@@ -196,7 +196,7 @@ async function removeAdmin(api, event, tID, target) {
     await api.changeAdminStatus(tID, uID, false);
 
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -205,12 +205,12 @@ async function removeAdmin(api, event, tID, target) {
 👤 ${name}
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`, 
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`, 
       tID 
     );
   } catch {
     api.sendMessage(
-`👑 𝗕𝗢𝗧 𝗢𝗪Ｎ𝗘𝗥 ⇢ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ✦ 𝗔𝗗𝗠𝗜𝗡 𝗠𝗔𝗡𝗔𝗚𝗘𝗥
 
@@ -218,13 +218,13 @@ async function removeAdmin(api, event, tID, target) {
 ➥ 𝗨𝗻𝗮𝗯𝗹𝗲 𝘁𝗼 𝗥𝗲𝗺𝗼𝘃𝗲 𝗔𝗱𝗺𝗶𝗻
 🔒 🇨🇭𝗲𝗰𝗸 𝗕𝗼𝘁 𝗣𝗲𝗿𝗺𝗶𝘀𝘀𝗶 OR 𝗠𝗶𝘀𝘀𝗶𝗼𝗻
 
-💡 【 👑-𝐒𝐈𝐘𝐀𝐌-👑 】⚠️ এই সদস্যকে Remove করা গেল না!
+💡 𝐒𝐈𝐅𝐀𝐓 ⚠️ এই সদস্যকে Remove করা গেল না!
 🚫 Bot Admin নেই
 🔰 অথবা যাকে Remove করা হচ্ছে, সে 🔰এডমিন🔰তার ক্ষমতা 💠Bot-এর চেয়ে বেশি✅।
 ✅ আগে Bot-কে Admin দিন, তারপর আবার চেষ্টা করুন।
 
 ━━━━━━━━━━━━
-✦ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧`,
+_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`,
       tID
     );
   }
