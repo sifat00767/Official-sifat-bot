@@ -5,8 +5,8 @@ const path = require("path");
 module.exports = {
   config: {
     name: "resend",
-    version: "2.1.0",
-    author: "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍",
+    version: "2.2.0",
+    author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 0,
     role: 0,
     shortDescription: {
@@ -152,8 +152,9 @@ module.exports = {
 
     // আনসেন্ড বা মেসেজ রিমুভ ইভেন্ট ধরা
     if (type === "message_unsend") {
+      // Strict Check: স্ট্যাটাস যদি পুরোপুরি true না হয় (false বা undefined), তবে কাজ করবে না
       const resendStatus = await threadsData.get(threadID, "data.resendStatus");
-      if (resendStatus === false) return;
+      if (resendStatus !== true) return;
 
       const getMsgData = global.resendMessageCache.get(messageID);
       if (!getMsgData) return;
