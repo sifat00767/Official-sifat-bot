@@ -130,7 +130,7 @@ module.exports = {
 
 ━━━━━━━━━━━━━━━━━━━
 👑 | BOT OWNER 
- 👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+SIFAT AHMED
 ━━━━━━━━━━━━━━━━━━━
 
 ${info.author}
