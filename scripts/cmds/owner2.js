@@ -43,7 +43,7 @@ module.exports = {
 
 📡 𝗣𝗟𝗘𝗔𝗦𝗘 𝗪𝗔𝗜𝗧 𝗢𝗪𝗡𝗘𝗥 2 𝗟𝗢𝗔𝗗𝗜𝗡𝗚... ⏳
  
-      👑 𝗦𝗜𝗬𝗔𝗠 𝗛𝗔𝗦𝗔𝗡 👑`,
+      👑 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃 👑`,
         event.threadID
       );
 
@@ -71,7 +71,7 @@ module.exports = {
 
         api.sendMessage(
           {
-            body: "🫵তোর আব্বু লাগে 👑𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑",
+            body: "🫵 এডমিন 👑 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃 👑",
             attachment: fs.createReadStream(filePath)
           },
           event.threadID,
