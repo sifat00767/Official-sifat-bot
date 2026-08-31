@@ -36,7 +36,7 @@ module.exports = {
 
       if (!userInfo || !userInfo[targetID]) {
         return api.sendMessage(
-          `❌ 𝗡𝗢𝗧 𝗙𝗢𝗨𝗡𝗗\n───────────────\n» 👤 𝗨𝘀𝗲𝗿 𝗶𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻 𝗻𝗼𝘁 𝗳𝗼𝘂𝗻𝗱.\n───────────────\n» 👑 𝗢𝗪𝗡𝗘𝗥 : 𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍`,
+          `❌ 𝗡𝗢𝗧 𝗙𝗢𝗨𝗡𝗗\n───────────────\n» 👤 𝗨𝘀𝗲𝗿 𝗶𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻 𝗻𝗼𝘁 𝗳𝗼𝘂𝗻𝗱.\n───────────────\n» 👑 𝗢𝗪𝗡𝗘𝗥 : 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃`,
           threadID,
           messageID
         );
@@ -97,7 +97,7 @@ module.exports = {
 » 🤝 𝗙𝗥𝗜𝗘𝗡𝗗 : ${info.isFriend ? "✅ Yes" : "❌ No"}
 » 🔗 𝗣𝗥𝗢𝗙𝗜𝗟𝗘 : https://facebook.com/${targetID}
 ───────────────
-» 👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 : 𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍`;
+» 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃`;
 
       if (fs.existsSync(imgPath)) {
         api.sendMessage(
@@ -118,7 +118,7 @@ module.exports = {
     } catch (err) {
       console.error(err);
       api.sendMessage(
-        `❌ 𝗘𝗥𝗥𝗢𝗥\n───────────────\n» ⚠️ 𝗖𝗼𝘂𝗹𝗱𝗻’𝘁 𝗳𝗲𝘁𝗰𝗵 𝘂𝘀𝗲𝗿 𝗶𝗻𝗳𝗼.\n───────────────\n» 👑 𝗢𝗪𝗡𝗘𝗥 : 𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍`,
+        `❌ 𝗘𝗥𝗥𝗢𝗥\n───────────────\n» ⚠️ 𝗖𝗼𝘂𝗹𝗱𝗻’𝘁 𝗳𝗲𝘁𝗰𝗵 𝘂𝘀𝗲𝗿 𝗶𝗻𝗳𝗼.\n───────────────\n» 👑 𝗢𝗪𝗡𝗘𝗥 : 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃`,
         event.threadID,
         event.messageID
       );
