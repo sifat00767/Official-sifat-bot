@@ -97,8 +97,7 @@ module.exports.onStart = async function ({ api, event }) {
 ╭───────────────⭓
   ${currentVideo.text}
  ───────────────⭓
-👑  𝗢𝗪𝗡𝗘𝗥 ➜
-    𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑  
+_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡  
 ╰───────────────⭓
 `;
 
