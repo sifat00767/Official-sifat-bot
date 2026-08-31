@@ -122,7 +122,7 @@ module.exports = {
 				const date = moment().tz("Asia/Dhaka").format("DD MMMM YYYY");
 
 				const msg = `
-   ⏤͟͟͞͞𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒅𝒆 𝑬𝒏𝒂𝒃𝒍𝒆 ✅
+   ✅ _⁠-𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒅𝒆 𝑬𝒏𝒂𝒃𝒍𝒆𝒅
 `;
 
 				return message.reply(msg);
@@ -137,7 +137,7 @@ module.exports = {
 				const date = moment().tz("Asia/Dhaka").format("DD MMMM YYYY");
 
 				const msg = `
-⏤͟͟͞͞𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒐𝒅 𝑫𝒊𝒔𝒂𝒃𝒍𝒆𝒅 ❎
+❎ _⁠-𝑨𝒅𝒎𝒊𝒏 𝑴𝒐𝒐𝒅 𝑫𝒊𝒔𝒂𝒃𝒍𝒆𝒅
 
 `;
 
