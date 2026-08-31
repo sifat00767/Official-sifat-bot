@@ -122,7 +122,7 @@ module.exports = {
 — 𝗕𝗲𝘀𝘁 𝗪𝗶𝘀𝗵𝗲𝘀
 ${senderName}
 
-👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ➜ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑  `;
+_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡  `;
 
       api.sendMessage(
         {
