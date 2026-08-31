@@ -28,7 +28,7 @@ module.exports = {
       const isGroupAdmin = groupAdmins.includes(sID);
 
       if (!isBotAdmin && !isGroupAdmin) {
-        return message.reply("❌ এই কমান্ডটি শুধুমাত্র আমার বস 🌝সিয়ামের জন্য🫶 তুই গরিব🥱 তোর কথা শুনবো না🌝 গরিবের দল 😁☹️!");
+        return message.reply("❌ এই কমান্ডটি শুধুমাত্র এডমিন এর জন্য🫶 তুই গরিব🥱 তোর কথা শুনবো না🌝 গরিবের দল 😁☹️!");
       }
 
       const status = args[0]?.toLowerCase();
@@ -43,10 +43,10 @@ module.exports = {
         global.__GroupLockWarn.forEach((val, key) => {
           if (key.startsWith(`${threadID}_`)) global.__GroupLockWarn.delete(key);
         });
-        return message.reply("সিয়াম ভাই 🔓 এই গ্রুপের আন লক করা হয়েছে🛸। এখন সবাই মেসেজ করতে পারবেন।🌝");
+        return message.reply("এডমিন 🔓 এই গ্রুপের আন লক করা হয়েছে🛸। এখন সবাই মেসেজ করতে পারবেন।🌝");
       }
 
-      return message.reply("⚠️ সিয়াম ভাই এইভাবে ব্যবহার করো:\n• লক করতে: ,grouplock on\n• লক খুলতে: ,grouplock off");
+      return message.reply("⚠️ এডমিন এইভাবে ব্যবহার করো:\n• লক করতে: ,grouplock on\n• লক খুলতে: ,grouplock off");
 
     } catch (err) {
       console.error(err);
@@ -94,14 +94,14 @@ module.exports = {
       if (warnCount > 3) {
         global.__GroupLockWarn.delete(userKey);
 
-        let kickMsg = `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 𝗦𝗜𝗬𝗔𝗠 𝗛𝗔𝗦𝗔𝗡 👑\n`;
+        let kickMsg = `_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n`;
         kickMsg += `───────────────────\n`;
         kickMsg += `⚠️ 𝗚𝗥𝗢𝗨𝗣 𝗟𝗢𝗖𝗞𝗘𝗗 ⚠️\n\n`;
         kickMsg += `👤 : @${userName}\n`;
         kickMsg += `🚫 : ৩ বার ওয়ার্নিং পাওয়ার পরও মেসেজ দিয়েছেন\n`;
-        kickMsg += `⚙️ : 😜মাদারচোদ 🫶সিয়াম ভাই য়ের 😌আদেশ না মানার কারণে 😬তোকে গ্রুপ থেকে 🦵লাথি দিয়ে সম্মানের সহিত বাহির করা হলো 🥱\n`;
+        kickMsg += `⚙️ : এডমিন এর আদেশ না মানার কারণে 😬তোকে গ্রুপ থেকে 🦵লাথি দিয়ে সম্মানের সহিত বাহির করা হলো 🥱\n`;
         kickMsg += `───────────────────\n`;
-        kickMsg += `🤖 𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧 🤖`;
+        kickMsg += `_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`;
 
         await api.sendMessage({
           body: kickMsg,
@@ -113,7 +113,7 @@ module.exports = {
       } else {
         let remain = 4 - warnCount;
         
-        let warnMsg = `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 𝗦𝗜𝗬𝗔𝗠 𝗛𝗔𝗦𝗔𝗡 👑\n`;
+        let warnMsg = `_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n`;
         warnMsg += `───────────────────\n`;
         warnMsg += `🔒 𝗚𝗥𝗢𝗨𝗣 𝗟𝗢𝗖𝗞𝗘𝗗 🔒\n\n`;
         warnMsg += `👤 : @${userName}\n`;
@@ -121,7 +121,7 @@ module.exports = {
         warnMsg += `⚠️ : [ ${warnCount} / ৩ ]\n`;
         warnMsg += `🚨 : আর মাত্র ${remain} বার সুযোগ আছে 🤧 প্রিয় 🫶, এরপর কিক খাবেন!\n`;
         warnMsg += `───────────────────\n`;
-        warnMsg += `🤖 𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧 🤖`;
+        warnMsg += `_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕`;
 
         return api.sendMessage({
           body: warnMsg,
