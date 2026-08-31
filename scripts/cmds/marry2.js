@@ -96,7 +96,7 @@ writer.on("finish", async () => {
 await api.unsendMessage(waitMsg.messageID).catch(() => {});
 await message.reply({
 body: `⬇️ 𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿 𝘾𝙊𝙈𝙋𝙇𝙀𝙏𝙀 ⬇️\n📌 Title: ${title}\⚡ 𝙋𝙊𝙒𝙀𝙍 𝘽𝙔 ⚡
-『 𝐒𝐈𝐘𝐀𝐌- 𝙋𝙍𝙊 』`,
+『 𝐒𝐈𝐅𝐀𝐓 』`,
 attachment: fs.createReadStream(filePath),
 });
 if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
