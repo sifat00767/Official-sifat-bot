@@ -160,7 +160,7 @@ module.exports = {
 
     // 📜 FULL LIST
     if (!input) {
-      let msg = `╭───────❁\n│👑‿𝐒𝐈𝐘𝐀𝐌 𝗛𝗘𝗟𝗣 𝗟𝗜𝗦𝗧👑 \n╰────────────❁\n`;
+      let msg = `╭───────❁\n│𝐒𝐘𝐒𝐓𝐄𝐌 𝗛𝗘𝗟𝗣 𝗟𝗜𝗦𝗧\n╰────────────❁\n`;
 
       for (const cat of Object.keys(categories).sort()) {
         msg += `╭─────✰『 ${getCategoryEmoji(cat)} ${fontConvert(cat, "category")} 』\n`;
