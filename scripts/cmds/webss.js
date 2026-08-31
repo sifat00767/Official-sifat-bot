@@ -38,7 +38,7 @@ module.exports = {
         `──────────────────\n` +
         `❌ Invalid Or Blocked Url\n\n` +
         `──────────────────\n` +
-        `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ➜ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑`
+        `_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡`
     }
   },
 
@@ -77,7 +77,7 @@ module.exports = {
             `🖼️ Type : Full Page\n` +
             `⚡ Status : Success\n\n` +
             `──────────────────\n` +
-            `👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 ➜ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑`,
+            `_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡`,
           attachment: fs.createReadStream(filePath)
         },
         () => fs.unlinkSync(filePath)
