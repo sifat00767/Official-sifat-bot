@@ -54,7 +54,7 @@ module.exports.onStart = async function ({ api, event }) {
 💚 ধন্যবাদ আমাদের সাথে থাকার জন্য 💚
 
 🌸 𝐂𝐄𝐎 𝐌𝐄𝐒𝐒𝐀𝐆𝐄 🌸
-Creator:👑𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍👑
+Creator:𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃
 ╰╼|━━━━━━━━━━━━━|╾╯`,
       attachment: groupImage ? fs.createReadStream(imgPath) : null
     };
