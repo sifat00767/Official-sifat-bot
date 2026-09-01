@@ -6,17 +6,17 @@ const path = require("path");
 module.exports = {
   config: {
     name: "uid",
-    version: "4.0.0",
+    version: "7.0.0",
     author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 3,
     role: 0,
     shortDescription: {
-      en: "Get user UID with a sleek mini hexagon card",
-      bn: "ছোট হেক্সাগন থাম্বনেইল সহ ইউআইডি দেখুন"
+      en: "Get user UID with a clean premium card",
+      bn: "ক্লিন প্রিমিয়াম কার্ড সহ ইউআইডি দেখুন"
     },
     longDescription: {
-      en: "Generates a compact, high-quality mini card with a unique hexagon profile picture and subtle branding.",
-      bn: "ইউনিক হেক্সাগন প্রোফাইল শেপ ও সূক্ষ্ম ব্র্যান্ডিং সহ ছোট কার্ড তৈরি করে।"
+      en: "Displays UID text message along with a ultra-clean premium styled image card.",
+      bn: "মেসেজে ইউআইডি টেক্সট এবং সাথে ক্লিন প্রিমিয়াম ইমেজ কার্ড পাঠায়।"
     },
     category: "info",
     guide: {
@@ -38,30 +38,30 @@ module.exports = {
       const userName = await usersData.getName(targetID);
       const avatarUrl = `https://graph.facebook.com/${targetID}/picture?height=500&width=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-      // ছোট ও স্লিম ক্যানভাস সাইজ (450x150)
-      const canvas = createCanvas(450, 150);
+      // ক্যানভাস সাইজ (550x200)
+      const canvas = createCanvas(550, 200);
       const ctx = canvas.getContext("2d");
 
       ctx.antialias = "subpixel";
 
-      // উন্নত সাইবার-ডার্ক ওশান গ্রেডিয়েন্ট
-      const gradient = ctx.createLinearGradient(0, 0, 450, 150);
-      gradient.addColorStop(0, "#09090e");
-      gradient.addColorStop(0.5, "#111625");
-      gradient.addColorStop(1, "#09101d");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 450, 150);
+      // ডার্ক প্রিমিয়াম মেটালিক ব্যাকগ্রাউন্ড
+      const bgGradient = ctx.createLinearGradient(0, 0, 550, 200);
+      bgGradient.addColorStop(0, "#0a0b10");
+      bgGradient.addColorStop(0.5, "#141622");
+      bgGradient.addColorStop(1, "#0a0b10");
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, 550, 200);
 
-      // নিওন সাইড গ্রাফিক্স বর্ডার
+      // এলিগ্যান্ট নিওন সাইড বর্ডার
       ctx.strokeStyle = "#00f2fe";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(6, 6, 438, 138);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(8, 8, 534, 184);
 
-      ctx.strokeStyle = "#9d4edd";
+      ctx.strokeStyle = "#7f00ff";
       ctx.lineWidth = 1;
-      ctx.strokeRect(9, 9, 432, 132);
+      ctx.strokeRect(12, 12, 526, 176);
 
-      // হেক্সাগন (Hexagon) ড্র করার ফাংশন
+      // হেক্সাগন ড্র করার ফাংশন
       function drawHexagon(x, y, r) {
         ctx.beginPath();
         for (let i = 0; i < 6; i++) {
@@ -78,40 +78,40 @@ module.exports = {
       try {
         const avatarImage = await loadImage(avatarUrl);
         ctx.save();
-        drawHexagon(75, 75, 42);
+        drawHexagon(95, 100, 55);
         ctx.clip();
-        ctx.drawImage(avatarImage, 30, 30, 90, 90);
+        ctx.drawImage(avatarImage, 40, 45, 110, 110);
         ctx.restore();
 
-        // হেক্সাগনের চারপাশে গ্লোয়িং নিওন বর্ডার
-        drawHexagon(75, 75, 43);
+        // হেক্সাগনের চারপাশে শার্প নিওন রিং
+        drawHexagon(95, 100, 57);
         ctx.strokeStyle = "#00f2fe";
         ctx.lineWidth = 2.5;
         ctx.stroke();
       } catch (e) {
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(30, 30, 90, 90);
+        ctx.fillRect(40, 45, 110, 110);
       }
 
-      // নাম (বোল্ড টেক্সট)
+      // ১. নাম (বোল্ড টেক্সট)
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 16px sans-serif";
-      const displayName = userName.length > 20 ? userName.substring(0, 20) + "..." : userName;
-      ctx.fillText(`NAME : ${displayName}`, 140, 50);
+      ctx.font = "bold 20px sans-serif";
+      const displayName = userName.length > 18 ? userName.substring(0, 18) + "..." : userName;
+      ctx.fillText(`NAME : ${displayName}`, 180, 65);
 
-      // ইউআইডি (হাইলাইটেড নিওন কালার)
+      // ২. ইউআইডি (নিওন পিংক কালার)
+      ctx.fillStyle = "#ff007f";
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillText(`UID  : ${targetID}`, 180, 105);
+
+      // ৩. সূক্ষ্ম ডিভাইডার লাইন
+      ctx.fillStyle = "rgba(0, 242, 254, 0.4)";
+      ctx.fillRect(180, 123, 330, 1.5);
+
+      // ৪. ⚡powerd by : Sifat Ahmed
       ctx.fillStyle = "#00f2fe";
-      ctx.font = "bold 15px sans-serif";
-      ctx.fillText(`UID  : ${targetID}`, 140, 80);
-
-      // সূক্ষ্ম ডিভাইডার লাইন
-      ctx.fillStyle = "rgba(157, 78, 221, 0.4)";
-      ctx.fillRect(140, 95, 270, 1);
-
-      // ছোট ও মানানসই Powered by Sifat Ahmed
-      ctx.fillStyle = "#6c757d";
-      ctx.font = "italic 11px sans-serif";
-      ctx.fillText("Powered by Sifat Ahmed", 140, 115);
+      ctx.font = "italic bold 13px sans-serif";
+      ctx.fillText("⚡powerd by : Sifat Ahmed", 180, 150);
 
       // ক্যাশে ফাইল সেভ
       const cachePath = path.join(__dirname, `cache/uid_${targetID}.png`);
@@ -120,9 +120,10 @@ module.exports = {
       const buffer = canvas.toBuffer("image/png");
       fs.writeFileSync(cachePath, buffer);
 
-      // কোনো বডি টেক্সট ছাড়া শুধু থাম্বনেইল পিকচার পাঠানো
+      // চ্যাটে বডি মেসেজ হিসেবে শুধু UID পাঠাবে
       return message.reply(
         {
+          body: `UID: ${targetID}`,
           attachment: fs.createReadStream(cachePath)
         },
         () => {
