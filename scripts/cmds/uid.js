@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: "uid",
-    version: "7.0.0",
+    version: "7.1.0",
     author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 3,
     role: 0,
@@ -15,7 +15,7 @@ module.exports = {
       bn: "ক্লিন প্রিমিয়াম কার্ড সহ ইউআইডি দেখুন"
     },
     longDescription: {
-      en: "Displays UID text message along with a ultra-clean premium styled image card.",
+      en: "Displays UID text message along with a clean premium styled image card.",
       bn: "মেসেজে ইউআইডি টেক্সট এবং সাথে ক্লিন প্রিমিয়াম ইমেজ কার্ড পাঠায়।"
     },
     category: "info",
@@ -29,13 +29,24 @@ module.exports = {
     try {
       let targetID = event.senderID;
 
-      if (Object.keys(event.mentions).length > 0) {
-        targetID = Object.keys(event.mentions)[0];
-      } else if (event.type === "message_reply") {
+      // ১. রিপ্লাই চেক
+      if (event.type === "message_reply" && event.messageReply?.senderID) {
         targetID = event.messageReply.senderID;
       }
+      // ২. মেনশন চেক
+      else if (event.mentions && Object.keys(event.mentions).length > 0) {
+        targetID = Object.keys(event.mentions)[0];
+      }
 
-      const userName = await usersData.getName(targetID);
+      // টার্গেট ইউজারের সঠিক নাম ফেচ করা
+      let userName = "Facebook User";
+      try {
+        const userInfo = await usersData.get(targetID);
+        userName = userInfo?.name || (await usersData.getName(targetID));
+      } catch (e) {
+        userName = "Facebook User";
+      }
+
       const avatarUrl = `https://graph.facebook.com/${targetID}/picture?height=500&width=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
       // ক্যানভাস সাইজ (550x200)
@@ -52,7 +63,7 @@ module.exports = {
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, 550, 200);
 
-      // এলিগ্যান্ট নিওন সাইড বর্ডার
+      // নিওন সাইড বর্ডার
       ctx.strokeStyle = "#00f2fe";
       ctx.lineWidth = 3;
       ctx.strokeRect(8, 8, 534, 184);
@@ -93,22 +104,22 @@ module.exports = {
         ctx.fillRect(40, 45, 110, 110);
       }
 
-      // ১. নাম (বোল্ড টেক্সট)
+      // ১. নাম
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 20px sans-serif";
       const displayName = userName.length > 18 ? userName.substring(0, 18) + "..." : userName;
       ctx.fillText(`NAME : ${displayName}`, 180, 65);
 
-      // ২. ইউআইডি (নিওন পিংক কালার)
+      // ২. ইউআইডি
       ctx.fillStyle = "#ff007f";
       ctx.font = "bold 18px sans-serif";
       ctx.fillText(`UID  : ${targetID}`, 180, 105);
 
-      // ৩. সূক্ষ্ম ডিভাইডার লাইন
+      // ৩. ডিভাইডার লাইন
       ctx.fillStyle = "rgba(0, 242, 254, 0.4)";
       ctx.fillRect(180, 123, 330, 1.5);
 
-      // ৪. ⚡powerd by : Sifat Ahmed
+      // ৪. ব্র্যান্ডিং
       ctx.fillStyle = "#00f2fe";
       ctx.font = "italic bold 13px sans-serif";
       ctx.fillText("⚡powerd by : Sifat Ahmed", 180, 150);
@@ -120,7 +131,7 @@ module.exports = {
       const buffer = canvas.toBuffer("image/png");
       fs.writeFileSync(cachePath, buffer);
 
-      // চ্যাটে বডি মেসেজ হিসেবে শুধু UID পাঠাবে
+      // চ্যাটে বডি মেসেজে সঠিক টার্গেট আইডি ও পিকচার যাবে
       return message.reply(
         {
           body: `UID: ${targetID}`,
