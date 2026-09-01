@@ -9,7 +9,7 @@ module.exports = {
   config: {
     name: "up",
     aliases: ["uptime", "status"],
-    version: "26.0.0",
+    version: "30.0.0",
     author: "Sifat Ahmed",
     countDown: 5,
     role: 0,
@@ -58,8 +58,8 @@ module.exports = {
 
     const currentDate = moment.tz("Asia/Dhaka").format("DD MMM YYYY | hh:mm A");
 
-    // Fetch User Profile Picture
-    const userImgUrl = `https://graph.facebook.com/${senderID}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+    // Fetch User DP
+    const userImgUrl = `https://graph.facebook.com/${senderID}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
     let userName = "Member";
     try {
@@ -74,153 +74,136 @@ module.exports = {
     try {
       if (!fs.existsSync(path.join(__dirname, "cache"))) fs.ensureDirSync(path.join(__dirname, "cache"));
 
-      // Canvas Dimensions (1600x700 - Big HD Quality)
-      const width = 1600;
-      const height = 700;
+      // Canvas Dimensions (1080x1600 - Tall Vertical Poster for Maximum Chat Display)
+      const width = 1080;
+      const height = 1600;
       const canvas = createCanvas(width, height);
       const ctx = canvas.getContext("2d");
 
-      // --- 1. Background ---
+      // --- 1. Dark Neon Background ---
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "#08090d");
-      bgGrad.addColorStop(0.5, "#0e131f");
-      bgGrad.addColorStop(1, "#171d2d");
+      bgGrad.addColorStop(0, "#05070a");
+      bgGrad.addColorStop(0.5, "#0b101d");
+      bgGrad.addColorStop(1, "#151b29");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Neon Accent Outer Lines
-      ctx.strokeStyle = "rgba(0, 242, 254, 0.25)";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(25, 25, width - 50, height - 50);
+      // Outer Glow Frame
+      ctx.strokeStyle = "rgba(0, 242, 254, 0.4)";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(30, 30, width - 60, height - 60);
 
-      // --- 2. Glassmorphism Main Panel ---
-      ctx.fillStyle = "rgba(18, 24, 38, 0.85)";
-      ctx.shadowColor = "rgba(0, 242, 254, 0.3)";
+      // --- 2. Main Glassmorphism Box ---
+      ctx.fillStyle = "rgba(16, 22, 36, 0.88)";
+      ctx.shadowColor = "rgba(0, 242, 254, 0.35)";
       ctx.shadowBlur = 40;
-      ctx.roundRect(50, 50, width - 100, height - 100, 25);
+      ctx.roundRect(60, 60, width - 120, height - 120, 35);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.strokeStyle = "rgba(0, 242, 254, 0.5)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(0, 242, 254, 0.6)";
+      ctx.lineWidth = 3;
       ctx.stroke();
 
-      // --- 3. Left Section: User DP (Instead of Robot) ---
-      const dpBoxX = 90;
-      const dpBoxY = 90;
-      const dpBoxWidth = 420;
-      const dpBoxHeight = 520;
+      // --- 3. Top Header Title ---
+      ctx.textAlign = "center";
+      ctx.font = "bold 52px Arial";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("⚡ GOATBOT V2 STATUS", width / 2, 160);
 
-      ctx.fillStyle = "rgba(10, 12, 18, 0.7)";
-      ctx.roundRect(dpBoxX, dpBoxY, dpBoxWidth, dpBoxHeight, 20);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-      ctx.stroke();
+      ctx.shadowColor = "#00f2fe";
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = "#00f2fe";
+      ctx.fillRect(150, 190, width - 300, 6);
+      ctx.shadowBlur = 0;
 
-      // Load Profile DP
+      // --- 4. User Large Circular DP Section ---
+      const avatarCenterX = width / 2;
+      const avatarCenterY = 420;
+      const avatarRadius = 180;
+
       try {
         const userImg = await loadImage(userImgUrl);
         ctx.save();
-        
-        // Circular Profile Picture Cutout
-        const avatarCenterX = dpBoxX + dpBoxWidth / 2;
-        const avatarCenterY = dpBoxY + 220;
-        const avatarRadius = 150;
-
         ctx.shadowColor = "#00f2fe";
-        ctx.shadowBlur = 25;
+        ctx.shadowBlur = 35;
         ctx.beginPath();
         ctx.arc(avatarCenterX, avatarCenterY, avatarRadius, 0, Math.PI * 2);
         ctx.clip();
         ctx.drawImage(userImg, avatarCenterX - avatarRadius, avatarCenterY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
         ctx.restore();
 
-        // DP Circle Border Glow
+        // Glowing DP Ring
         ctx.beginPath();
         ctx.arc(avatarCenterX, avatarCenterY, avatarRadius, 0, Math.PI * 2);
         ctx.strokeStyle = "#00f2fe";
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 10;
         ctx.stroke();
 
       } catch (err) {
-        ctx.font = "bold 100px Arial";
-        ctx.textAlign = "center";
+        ctx.font = "bold 140px Arial";
         ctx.fillStyle = "#00f2fe";
-        ctx.fillText("👤", dpBoxX + dpBoxWidth / 2, dpBoxY + 250);
+        ctx.fillText("👤", avatarCenterX, avatarCenterY + 40);
       }
 
-      // Display User Name below DP
-      ctx.textAlign = "center";
-      ctx.font = "bold 26px Arial";
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "#00f2fe";
-      ctx.shadowBlur = 10;
-      ctx.fillText(userName.toUpperCase(), dpBoxX + dpBoxWidth / 2, dpBoxY + 450);
-      ctx.shadowBlur = 0;
-
-      // --- 4. Right Section: System Stats ---
-      const startX = 560;
-      let startY = 130;
-
-      // Header Title
-      ctx.textAlign = "left";
+      // User Name Label
       ctx.font = "bold 42px Arial";
       ctx.fillStyle = "#ffffff";
-      ctx.fillText("⚡ GOATBOT V2 SYSTEM STATUS", startX, startY);
-
-      // Title Glow Line
       ctx.shadowColor = "#00f2fe";
       ctx.shadowBlur = 15;
-      ctx.fillStyle = "#00f2fe";
-      ctx.fillRect(startX, startY + 15, 930, 4);
+      ctx.fillText(userName.toUpperCase(), width / 2, 670);
       ctx.shadowBlur = 0;
 
-      startY += 80;
-
-      // Stats Table Layout
+      // --- 5. System Stats Vertical List ---
+      let startY = 780;
       const pingMS = Date.now() - timeStart;
       const stats = [
         { label: "⏱️ UPTIME", val: uptimeStr, color: "#00ffcc" },
-        { label: "🧠 RAM USAGE", val: `${usedMem.toFixed(2)} GB / ${totalMem.toFixed(2)} GB (${ramPercentage}%)`, color: "#ff3366" },
-        { label: "🎛️ CPU CORES", val: `${cpuCores} Cores (${cpuModel.trim()})`, color: "#4facfe" },
-        { label: "📶 LATENCY/PING", val: `${pingMS} ms`, color: "#ffff00" },
+        { label: "🧠 RAM USAGE", val: `${usedMem.toFixed(2)}GB / ${totalMem.toFixed(2)}GB (${ramPercentage}%)`, color: "#ff3366" },
+        { label: "🎛️ CPU CORES", val: `${cpuCores} Cores`, color: "#4facfe" },
+        { label: "📶 LATENCY", val: `${pingMS} ms`, color: "#ffff00" },
         { label: "📅 DATE & TIME", val: currentDate, color: "#e100ff" },
-        { label: "⚙️ ENVIRONMENT", val: `Node.js ${process.version} (${os.platform()} ${os.arch()})`, color: "#00ffaa" }
+        { label: "⚙️ OS PLATFORM", val: `${os.platform()} (${os.arch()})`, color: "#00ffaa" }
       ];
 
-      ctx.font = "bold 24px Arial";
       stats.forEach((item) => {
+        // Card Background for Each Stat
+        ctx.fillStyle = "rgba(10, 14, 23, 0.7)";
+        ctx.roundRect(100, startY - 40, width - 200, 75, 15);
+        ctx.fill();
+
+        ctx.textAlign = "left";
+        ctx.font = "bold 30px Arial";
         ctx.fillStyle = "#a0aec0";
-        ctx.fillText(item.label, startX, startY);
-        ctx.fillText(":", startX + 240, startY);
+        ctx.fillText(item.label, 130, startY + 8);
 
+        ctx.textAlign = "right";
         ctx.fillStyle = item.color;
-        ctx.fillText(item.val, startX + 270, startY);
+        ctx.fillText(item.val, width - 130, startY + 8);
 
-        startY += 50;
+        startY += 95;
       });
 
-      // --- 5. Footer: Custom Cyan & Pink Neon Branding ---
-      const footerY = 600;
+      // --- 6. Footer Branding (Cyan & Pink) ---
+      const footerY = 1480;
       
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
       ctx.beginPath();
-      ctx.moveTo(startX, footerY - 20);
-      ctx.lineTo(startX + 930, footerY - 20);
+      ctx.moveTo(100, footerY - 40);
+      ctx.lineTo(width - 100, footerY - 40);
       ctx.stroke();
 
-      ctx.textAlign = "right";
-      ctx.font = "bold italic 28px Arial";
+      ctx.textAlign = "center";
+      ctx.font = "bold italic 36px Arial";
       
-      // New Cyan & Hot Pink Neon Color
-      const neonGrad = ctx.createLinearGradient(width - 500, footerY, width - 100, footerY);
+      const neonGrad = ctx.createLinearGradient(200, footerY, width - 200, footerY);
       neonGrad.addColorStop(0, "#00f2fe");
       neonGrad.addColorStop(1, "#ff007f");
 
       ctx.shadowColor = "#ff007f";
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 20;
       ctx.fillStyle = neonGrad;
-      ctx.fillText("👑 Powered by : Sifat Ahmed", width - 100, footerY);
+      ctx.fillText("👑 Powered by : Sifat Ahmed", width / 2, footerY);
       ctx.shadowBlur = 0;
 
       // File Save & Send
