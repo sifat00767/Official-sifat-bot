@@ -6,169 +6,210 @@ const { createCanvas, loadImage } = require("canvas");
 const moment = require("moment-timezone");
 
 module.exports = {
-config: {
-name: "up",
-aliases: ["uptime", "status"],
-version: "22.0.0",
-author: "Milon",
-countDown: 5,
-role: 0,
-category: "system",
-description: "Admin: No Prefix (100037154624637) | User: With Prefix",
-usePrefix: true
-},
+  config: {
+    name: "up",
+    aliases: ["uptime", "status"],
+    version: "25.0.0",
+    author: "Sifat Ahmed",
+    countDown: 5,
+    role: 0,
+    category: "system",
+    description: "Admin: No Prefix (100037154624637) | User: With Prefix",
+    usePrefix: true
+  },
 
-/* --- [ 🔐 FILE_CREATOR_INFORMATION ] ---
-* 🤖 𝐁𝐎𝐓 𝐍𝐀𝐌𝐄   ➤ 𝐒𝐈𝐘𝐀𝐌-𝐁𝐎𝐓
-* 👑 𝐎𝐖𝐍𝐄𝐑      ➤ 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
-* 🌐 𝐅𝐀𝐂𝐄𝐁𝐎𝐎𝐊   ➤ https://www.facebook.com/share/1HDei2BktY/
-* 📞 𝐖𝐇𝐀𝐓𝐒𝐀𝐏𝐏  ➤ +880 1789138157
-* 📍 𝐋𝐎𝐂𝐀𝐓𝐈𝐎𝐍   ➤ 𝐊𝐈𝐒𝐇𝐎𝐑𝐄𝐆𝐀𝐍𝐉, 𝐁𝐀𝐍𝐆𝐋𝐀𝐃𝐄𝐒𝐇
-* 🛠️ 𝐏𝐑𝐎𝐉𝐄𝐂𝐓    ➤ 𝐒𝐈𝐘𝐀𝐌 𝐁𝐎𝐓 𝐏𝐑𝐎𝐉𝐄𝐂𝐓 (𝟐𝟎𝟐𝟔))
-* --------------------------------------- */
-onStart: async function ({ api, event, args }) {
-// onStart ekhon shudhu prefix wala command handle korbe (Normal users)
-return this.handleUptime({ api, event });
-},
+  onStart: async function ({ api, event }) {
+    return this.handleUptime({ api, event });
+  },
 
-onChat: async function ({ api, event }) {
-const { body, senderID } = event;
-if (!body) return;
+  onChat: async function ({ api, event }) {
+    const { body, senderID } = event;
+    if (!body) return;
 
-// Hardcoded Admin UID check for No Prefix
-const adminUID = "100037154624637";
-const msg = body.toLowerCase();
+    const adminUID = "100037154624637";
+    const msg = body.toLowerCase();
 
-if (senderID == adminUID && (msg == "up" || msg == "uptime")) {
-return this.handleUptime({ api, event });
-}
-},
+    if (senderID == adminUID && (msg == "up" || msg == "uptime")) {
+      return this.handleUptime({ api, event });
+    }
+  },
 
-handleUptime: async function ({ api, event }) {
-const { threadID, messageID, senderID } = event;
+  handleUptime: async function ({ api, event }) {
+    const { threadID, messageID, senderID } = event;
 
-// STEP 1: Sending Checking Message
-const sendChecking = await api.sendMessage("🔍 𝐂𝐇𝐄𝐂𝐊𝐈𝐍𝐆 𝐒𝐘𝐒𝐓𝐄𝐌 𝐒𝐓𝐀𝐓𝐔𝐒...⚙️ 𝐏𝐋𝐄𝐀𝐒𝐄 𝐖𝐀𝐈𝐓 ....", threadID);
+    const sendChecking = await api.sendMessage("🔍 𝐂𝐇𝐄𝐂𝐊𝐈𝐍𝐆 𝐒𝐘𝐒𝐓𝐄𝐌 𝐒𝐓𝐀𝐓𝐔𝐒...⚙️ 𝐏𝐋𝐄𝐀𝐒𝐄 𝐖𝐀𝐈𝐓 ....", threadID);
 
-const timeStart = Date.now();
-const uptime = process.uptime();
-const hours = Math.floor(uptime / 3600);
-const minutes = Math.floor((uptime % 3600) / 60);
-const timeString = `${hours}h ${minutes}m`;
+    const timeStart = Date.now();
+    const uptime = process.uptime();
+    const days = Math.floor(uptime / (3600 * 24));
+    const hours = Math.floor((uptime % (3600 * 24)) / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+    const uptimeStr = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-const usedMem = ((os.totalmem() - os.freemem()) / (1024 ** 3)).toFixed(1);
-const totalMem = (os.totalmem() / (1024 ** 3)).toFixed(1);
-const ramPercentage = ((usedMem / totalMem) * 100).toFixed(0);
-const currentDate = moment.tz("Asia/Dhaka").format("DD/MM/YYYY");
+    // System Stats
+    const totalMem = os.totalmem() / (1024 ** 3);
+    const freeMem = os.freemem() / (1024 ** 3);
+    const usedMem = totalMem - freeMem;
+    const ramPercentage = ((usedMem / totalMem) * 100).toFixed(1);
+    
+    const cpuCores = os.cpus().length;
+    const cpuModel = os.cpus()[0]?.model.split("@")[0] || "Standard Processor";
 
-let userName = "User";
-try {
-const info = await api.getUserInfo(senderID);
-userName = info[senderID].name;
-} catch (e) { userName = "Developer"; }
+    const currentDate = moment.tz("Asia/Dhaka").format("DD MMM YYYY | hh:mm A");
 
-const imgUrl = "https://i.imgur.com/xHpbI1i.jpeg";
-const userImgUrl = `https://graph.facebook.com/${senderID}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
-const cachePath = path.join(__dirname, "cache", `up_milon_final_${Date.now()}.png`);
+    const cachePath = path.join(__dirname, "cache", `up_sifat_${Date.now()}.png`);
 
-try {
-if (!fs.existsSync(path.join(__dirname, "cache"))) fs.ensureDirSync(path.join(__dirname, "cache"));
+    try {
+      if (!fs.existsSync(path.join(__dirname, "cache"))) fs.ensureDirSync(path.join(__dirname, "cache"));
 
-const image = await loadImage(imgUrl);
-const canvas = createCanvas(image.width, image.height);
-const ctx = canvas.getContext("2d");
-ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      // Canvas Dimensions (1200x500)
+      const width = 1200;
+      const height = 500;
+      const canvas = createCanvas(width, height);
+      const ctx = canvas.getContext("2d");
 
-const centerX = canvas.width / 2;
-const centerY = canvas.height / 2;
+      // --- 1. Dark Gradient Background ---
+      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+      bgGrad.addColorStop(0, "#0a0c10");
+      bgGrad.addColorStop(0.5, "#0d1117");
+      bgGrad.addColorStop(1, "#161b22");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
 
-// --- USER PROFILE (Box 220x220) ---
-const boxSize = 220;
-const boxX = centerX - (boxSize / 2);
-const boxY = centerY - (boxSize / 2) + 15;
+      // Neon Accent Lines
+      ctx.strokeStyle = "rgba(0, 242, 254, 0.15)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(20, 20, width - 40, height - 40);
 
-try {
-const userImg = await loadImage(userImgUrl);
-ctx.shadowColor = "#00ffff";
-ctx.shadowBlur = 25;
-ctx.strokeStyle = "#ffffff";
-ctx.lineWidth = 5;
-ctx.strokeRect(boxX, boxY, boxSize, boxSize);
-ctx.shadowBlur = 0; 
-ctx.drawImage(userImg, boxX, boxY, boxSize, boxSize);
+      // --- 2. Glassmorphism Main Panel ---
+      ctx.fillStyle = "rgba(22, 27, 34, 0.75)";
+      ctx.shadowColor = "rgba(0, 242, 254, 0.2)";
+      ctx.shadowBlur = 30;
+      ctx.roundRect(40, 40, width - 80, height - 80, 20);
+      ctx.fill();
+      ctx.shadowBlur = 0; // Reset Shadow
 
-ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-ctx.fillRect(boxX, boxY + boxSize - 35, boxSize, 35);
-ctx.textAlign = "center";
-ctx.fillStyle = "#ffffff";
-ctx.font = "bold 16px Arial";
-ctx.fillText(userName.toUpperCase(), centerX, boxY + boxSize - 12);
-} catch (err) { console.log("Image load failed"); }
+      // Border for Panel
+      ctx.strokeStyle = "rgba(0, 242, 254, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-// --- Circles ---
-const drawCircle = (x, y, radius, percent, label, value, color) => {
-ctx.beginPath();
-ctx.arc(x, y, radius, 0, Math.PI * 2);
-ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-ctx.lineWidth = 10; ctx.stroke();
-ctx.beginPath();
-ctx.arc(x, y, radius, -Math.PI / 2, (-Math.PI / 2) + (Math.PI * 2 * (percent / 100)));
-ctx.strokeStyle = color;
-ctx.lineWidth = 10; ctx.lineCap = "round"; ctx.stroke();
-ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
-ctx.font = "bold 20px Arial"; ctx.fillText(value, x, y + 8);
-ctx.font = "14px Arial"; ctx.fillText(label, x, y + 35);
-};
+      // --- 3. Left Section: 3D Robot Logo Box ---
+      const robotBoxX = 70;
+      const robotBoxY = 70;
+      const robotBoxWidth = 320;
+      const robotBoxHeight = 360;
 
-const uptimeX = boxX - 110;
-const ramX = boxX + boxSize + 110;
-drawCircle(uptimeX, centerY + 30, 60, 75, "UPTIME", timeString, "#00ffcc");
-drawCircle(ramX, centerY - 40, 60, ramPercentage, "RAM", `${ramPercentage}%`, "#ff3366");
-const pingMS = Date.now() - timeStart;
-drawCircle(ramX, centerY + 90, 50, 80, "PING", `${pingMS}ms`, "#ffff00");
+      ctx.fillStyle = "rgba(10, 12, 16, 0.6)";
+      ctx.roundRect(robotBoxX, robotBoxY, robotBoxWidth, robotBoxHeight, 15);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.stroke();
 
-// Footer
-ctx.textAlign = "center";
-ctx.font = "bold 24px Arial";
-ctx.fillStyle = "#00ff00";
-ctx.fillText("● SYSTEM STATUS: ACTIVE", centerX, canvas.height - 65);
-ctx.font = "italic bold 18px Arial"; 
-ctx.fillStyle = "#FFD700"; 
-ctx.fillText("𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐃 𝐁𝐘:𝐒𝐈𝐘𝐀𝐌 𝐇𝐀𝐒𝐀𝐍", centerX, canvas.height - 95);
+      // Load 3D Cyber Robot Banner Logo
+      const robotLogoUrl = "https://i.imgur.com/2A48M3s.png"; // Dynamic High Quality Cyber Robot Avatar
+      try {
+        const robotImg = await loadImage(robotLogoUrl);
+        ctx.save();
+        ctx.roundRect(robotBoxX + 10, robotBoxY + 10, robotBoxWidth - 20, robotBoxHeight - 20, 10);
+        ctx.clip();
+        ctx.drawImage(robotImg, robotBoxX + 10, robotBoxY + 10, robotBoxWidth - 20, robotBoxHeight - 20);
+        ctx.restore();
+      } catch (err) {
+        // Fallback Vector Robot Icon if image link fails
+        ctx.font = "bold 90px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00f2fe";
+        ctx.fillText("🤖", robotBoxX + robotBoxWidth / 2, robotBoxY + 200);
+      }
 
-// Bot Name & Date
-ctx.textAlign = "left";
-ctx.font = "bold 30px Arial";
-ctx.shadowColor = "#0000ff"; ctx.shadowBlur = 15;
-ctx.fillStyle = "#33ccff";
-ctx.fillText("𝐒𝐈𝐘𝐀𝐌-𝐁𝐎𝐓", 199, 128); 
+      // --- 4. Right Section: System Metrics ---
+      const startX = 420;
+      let startY = 100;
 
-const dateX = centerX + 82;
-const dateY = 120; 
-ctx.shadowBlur = 20; ctx.shadowColor = "#FF00FF";
-ctx.textAlign = "center";
-ctx.font = "bold 22px Arial";
-const gradient = ctx.createLinearGradient(dateX - 70, dateY, dateX + 70, dateY);
-gradient.addColorStop(0, "#FF0000"); gradient.addColorStop(0.5, "#00FF00"); gradient.addColorStop(1, "#0000FF");
-ctx.fillStyle = "#FFFFFF"; 
-ctx.fillText(`| ${currentDate}`, dateX, dateY);
-ctx.shadowBlur = 0;
-ctx.strokeStyle = gradient; ctx.lineWidth = 1.5;
-ctx.strokeText(`| ${currentDate}`, dateX, dateY);
+      // Header Title
+      ctx.textAlign = "left";
+      ctx.font = "bold 32px Arial";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("⚡ GOATBOT V2 SYSTEM STATUS", startX, startY);
 
-const buffer = canvas.toBuffer("image/png");
-fs.writeFileSync(cachePath, buffer);
+      // Title Glow Line
+      ctx.shadowColor = "#00f2fe";
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = "#00f2fe";
+      ctx.fillRect(startX, startY + 12, 680, 3);
+      ctx.shadowBlur = 0;
 
-// STEP 2: Send & Delete Checking
-return api.sendMessage({ attachment: fs.createReadStream(cachePath) }, threadID, async (err) => {
-if (!err) api.unsendMessage(sendChecking.messageID);
-if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
-}, messageID);
+      startY += 55;
 
-} catch (e) {
-console.error(e);
-api.unsendMessage(sendChecking.messageID);
-return api.sendMessage("❌ Error generating status!", threadID, messageID);
-}
-}
+      // Stats Table Layout
+      const pingMS = Date.now() - timeStart;
+      const stats = [
+        { label: "⏱️ UPTIME", val: uptimeStr, color: "#00ffcc" },
+        { label: "🧠 RAM USAGE", val: `${usedMem.toFixed(2)} GB / ${totalMem.toFixed(2)} GB (${ramPercentage}%)`, color: "#ff3366" },
+        { label: "🎛️ CPU CORES", val: `${cpuCores} Cores (${cpuModel.trim()})`, color: "#4facfe" },
+        { label: "📶 LATENCY/PING", val: `${pingMS} ms`, color: "#ffff00" },
+        { label: "📅 DATE & TIME", val: currentDate, color: "#e100ff" },
+        { label: "⚙️ ENVIRONMENT", val: `Node.js ${process.version} (${os.platform()} ${os.arch()})`, color: "#00ffaa" }
+      ];
+
+      ctx.font = "bold 18px Arial";
+      stats.forEach((item) => {
+        // Label
+        ctx.fillStyle = "#8b949e";
+        ctx.fillText(item.label, startX, startY);
+        ctx.fillText(":", startX + 180, startY);
+
+        // Value with Neon Accent
+        ctx.fillStyle = item.color;
+        ctx.fillText(item.val, startX + 200, startY);
+
+        startY += 36;
+      });
+
+      // --- 5. Footer: Powered By Sifat Ahmed ---
+      const footerY = 415;
+      
+      // Divider Line
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.moveTo(startX, footerY - 15);
+      ctx.lineTo(startX + 680, footerY - 15);
+      ctx.stroke();
+
+      ctx.textAlign = "right";
+      ctx.font = "bold italic 22px Arial";
+      
+      // Branding Gold Gradient Text
+      const goldGrad = ctx.createLinearGradient(width - 400, footerY, width - 80, footerY);
+      goldGrad.addColorStop(0, "#FFD700");
+      goldGrad.addColorStop(1, "#FFA500");
+
+      ctx.shadowColor = "#FFD700";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = goldGrad;
+      ctx.fillText("👑 Powered by : Sifat Ahmed", width - 80, footerY);
+      ctx.shadowBlur = 0;
+
+      // File Save & Send
+      const buffer = canvas.toBuffer("image/png");
+      fs.writeFileSync(cachePath, buffer);
+
+      return api.sendMessage(
+        { attachment: fs.createReadStream(cachePath) },
+        threadID,
+        async (err) => {
+          if (!err) api.unsendMessage(sendChecking.messageID);
+          if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
+        },
+        messageID
+      );
+
+    } catch (e) {
+      console.error(e);
+      api.unsendMessage(sendChecking.messageID);
+      return api.sendMessage("❌ Error generating system uptime canvas!", threadID, messageID);
+    }
+  }
 };
