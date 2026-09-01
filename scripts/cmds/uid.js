@@ -6,16 +6,16 @@ const { createCanvas, loadImage } = require("canvas");
 module.exports = {
   config: {
     name: "uid",
-    version: "4.0.0",
+    version: "6.0.0",
     author: "MR_FARHAN",
     countDown: 5,
     role: 0,
-    nonPrefix: true, // Prefix ছাড়া এবং Prefix সহ - দুইভাবেই সমান কাজ করবে
+    nonPrefix: true, // Non-prefix সাপোর্ট চালু
     shortDescription: {
       en: "Get user's UID and Stylist Banner"
     },
     longDescription: {
-      en: "Generates an advanced banner (1200x500) with accurate target User ID, Name, and Avatar."
+      en: "Generates an advanced banner with accurate target User ID, Name, and Avatar."
     },
     category: "info",
     guide: {
@@ -23,27 +23,49 @@ module.exports = {
     }
   },
 
-  onStart: async function ({ api, event, args, usersData }) {
-    const { threadID, messageID, senderID, type, messageReply, mentions } = event;
+  onStart: async function ({ api, event, args, usersData, config, role }) {
+    const { threadID, messageID, senderID, type, messageReply, mentions, body } = event;
     const cachePath = path.join(__dirname, "cache", `uid_${Date.now()}.png`);
 
-    // ১. মেনশন, রিপ্লাই বা আর্গুমেন্ট থেকে নিখুঁতভাবে টার্গেট ইউজার আইডি শনাক্ত করা
-    let targetID = senderID;
+    // --- ১. প্রিফিক্স এবং বট অ্যাডমিন ফিল্টার ---
+    const prefix = config.PREFIX || "!";
+    const isPrefix = body.startsWith(prefix);
+    
+    // বট অ্যাডমিন চেক (role >= 2 অথবা adminIDs তে আইডি থাকা)
+    const adminIDs = config.adminBot || config.NDH || [];
+    const isAdmin = role >= 2 || adminIDs.includes(senderID);
 
-    if (type === "message_reply") {
+    // সাধারণ মেম্বার প্রিফিক্স ছাড়া uid লিখলে কমান্ড কাজ করবে না
+    if (!isPrefix && !isAdmin) {
+      return;
+    }
+
+    // --- ২. মেনশন/রিপ্লাই থেকে সঠিক টার্গেট আইডি বের করার নিখুঁত লজিক ---
+    let targetID = senderID; // ডিফল্টভাবে নিজের আইডি
+
+    // ক) মেসেজ রিপ্লাই দিলে
+    if (type === "message_reply" && messageReply) {
       targetID = messageReply.senderID;
-    } else if (mentions && Object.keys(mentions).length > 0) {
+    } 
+    // খ) মেনশন দিলে (event.mentions থেকে)
+    else if (mentions && Object.keys(mentions).length > 0) {
       targetID = Object.keys(mentions)[0];
-    } else if (args.length > 0 && !isNaN(args[0])) {
-      targetID = args[0];
+    } 
+    // গ) ব্যাকআপ: নন-প্রিফিক্স মোডে মেনশন ক্যাচ করা (মেসেজ বডি ফিল্টার)
+    else if (args.length > 0) {
+      const mentionedKey = Object.keys(mentions || {});
+      if (mentionedKey.length > 0) {
+        targetID = mentionedKey[0];
+      } else if (!isNaN(args[0])) {
+        targetID = args[0]; // সরাসরি UID সংখ্যা দিলে
+      }
     }
 
     const processMsg = await api.sendMessage("-ˋˏ✄━═━═━═", threadID);
 
     try {
-      // ২. ব্যবহারকারীর সঠিক নাম বের করার সিস্টেম (ডিবি + ফেসবুক ব্যাকআপ API)
+      // --- ৩. নাম বের করার ফিক্স (ফেসবুক API + লোকাল ডিবি) ---
       let name = "FB User";
-      
       try {
         const userInfo = await api.getUserInfo(targetID);
         if (userInfo && userInfo[targetID] && userInfo[targetID].name) {
@@ -57,7 +79,7 @@ module.exports = {
         if (userData && userData.name) name = userData.name;
       }
 
-      // ৩. ক্যানভাস সেটআপ (1200x500 HD Banner)
+      // --- ৪. ক্যানভাস ব্যানার (1200x500 HD) ---
       const width = 1200;
       const height = 500;
       const canvas = createCanvas(width, height);
@@ -73,7 +95,7 @@ module.exports = {
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, width, height);
 
-      // গ্লাস বক্স Overlay
+      // গ্লাস বর্ডার বক্স
       ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
       ctx.fillRect(30, 30, width - 60, height - 60);
 
@@ -86,7 +108,7 @@ module.exports = {
       ctx.lineWidth = 2;
       ctx.strokeRect(40, 40, width - 80, height - 80);
 
-      // ৪. প্রোফাইল পিকচার (Avatar) লোড
+      // --- ৫. প্রোফাইল পিকচার (Avatar) লোড ---
       let avatarImg;
       try {
         const avatarUrl = `https://graph.facebook.com/${targetID}/picture?height=500&width=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
@@ -96,7 +118,7 @@ module.exports = {
         avatarImg = await loadImage("https://i.imgur.com/6V403qG.png");
       }
 
-      // অ্যাভাটার নিওন গ্লো ও শেপ
+      // অ্যাভাটার শেপ ও গ্লো
       const avatarX = 230;
       const avatarY = 250;
       const radius = 135;
@@ -116,7 +138,7 @@ module.exports = {
       ctx.drawImage(avatarImg, avatarX - radius, avatarY - radius, radius * 2, radius * 2);
       ctx.restore();
 
-      // ৫. টেক্সট লেআউট
+      // --- ৬. টেক্সট সাজানো ---
       const textStartX = 430;
 
       // NAME
@@ -150,7 +172,7 @@ module.exports = {
       ctx.font = "bold 26px sans-serif";
       ctx.fillText("Sifat Ahmed", textStartX + 220, 395);
 
-      // ৬. সেভ এবং সেন্ড
+      // --- ৭. সেভ ও সেন্ড ---
       fs.ensureDirSync(path.join(__dirname, "cache"));
       const buffer = canvas.toBuffer("image/png");
       fs.writeFileSync(cachePath, buffer);
