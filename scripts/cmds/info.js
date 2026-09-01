@@ -1,74 +1,58 @@
 const moment = require("moment-timezone");
 
-let videoIndex = 0; // ✅ Video rotation system
-
 module.exports = {
-config: {
-name: "info",
-version: "4.1.2",
-author: "Siyam",
-role: 0,
-countDown: 20,
-shortDescription: {
-en: "Owner & bot info"
-},
-longDescription: {
-en: "Show full stylish info"
-},
-category: "owner",
-guide: {
-en: "{pn}"
-}
-},
+  config: {
+    name: "info",
+    version: "4.2.0",
+    author: "SIFAT",
+    role: 0,
+    countDown: 5,
+    shortDescription: {
+      en: "Owner & bot info"
+    },
+    longDescription: {
+      en: "Show full stylish info text panel"
+    },
+    category: "owner",
+    guide: {
+      en: "{pn}"
+    }
+  },
 
-onStart: async function ({ message, event, api }) {
+  onStart: async function ({ message, event, api }) {
+    const totalCommands = global.GoatBot?.commands?.size || 0;
 
-const totalCommands = global.GoatBot?.commands?.size || 0;  
+    const now = moment().tz("Asia/Dhaka");
+    const date = now.format("MMMM Do YYYY");
+    const time = now.format("h:mm:ss A");
 
-const now = moment().tz("Asia/Dhaka");  
-const date = now.format("MMMM Do YYYY");  
-const time = now.format("h:mm:ss A");  
+    const uptime = process.uptime();
+    const days = Math.floor(uptime / 86400);
+    const hours = Math.floor((uptime % 86400) / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-const uptime = process.uptime();  
-const days = Math.floor(uptime / 86400);  
-const hours = Math.floor((uptime % 86400) / 3600);  
-const minutes = Math.floor((uptime % 3600) / 60);  
-const seconds = Math.floor(uptime % 60);  
+    const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;  
+    const prefix = global.utils.getPrefix(event.threadID);
+    const groupName = event.threadName || "Unknown Group";
 
-const prefix = global.utils.getPrefix(event.threadID);  
-const groupName = event.threadName || "Unknown Group";  
+    // AUTO BOT NAME SYSTEM
+    let botName = "Unknown Bot";
+    try {
+      const botID = api.getCurrentUserID();
+      const botInfo = await api.getUserInfo(botID);
+      botName = botInfo[botID]?.name || "Bot";
+    } catch (e) {}
 
-// ✅ AUTO BOT NAME SYSTEM  
-let botName = "Unknown Bot";  
-try {  
-  const botID = api.getCurrentUserID();  
-  const botInfo = await api.getUserInfo(botID);  
-  botName = botInfo[botID]?.name || "Bot";  
-} catch (e) {}  
-
-// ✅ VIDEO LIST
-const videos = [
-  "https://files.catbox.moe/8f2fc5.mp4",
-  "https://files.catbox.moe/3aikdw.mp4"
-];
-
-// ✅ AUTO CHANGE VIDEO
-const videoLink = videos[videoIndex];
-videoIndex = (videoIndex + 1) % videos.length;
-
-return message.reply({  
-  body: `
-
-👑 ╭─❖ 𝐁𝐎𝐓 𝐎𝐖𝐍𝐄𝐑 ❖─╮
+    const textInfo = `👑 ╭─❖ 𝐁𝐎𝐓 𝐎𝐖𝐍𝐄𝐑 ❖─╮
 ╰➤ 𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃
 
 🤖 ╭─❖ 𝐁𝐎𝐓 𝐍𝐀𝐌𝐄 ❖─╮
 ╰➤ ${botName}
 
 🎂 ╭─❖ 𝐀𝐆𝐄 ❖─╮
-╰➤ 𝟏9+
+╰➤ 𝟏𝟗+
 
 🚻 ╭─❖ 𝐆𝐄𝐍𝐃𝐄𝐑 ❖─╮
 ╰➤ 𝐌𝐀𝐋𝐄
@@ -104,11 +88,10 @@ return message.reply({
 ╰➤ 𝐒𝐈𝐍𝐆𝐋𝐄
 
 🛠 ╭─❖ 𝐖𝐎𝐑𝐊 ❖─╮
-╰➤𝐒𝐓𝐔𝐃𝐄𝐍𝐓
+╰➤ 𝐒𝐓𝐔𝐃𝐄𝐍𝐓
 
-╰━━━━━❖✡️❖━━━━━╯
-`,
-attachment: await global.utils.getStreamFromURL(videoLink)
-});
-}
+╰━━━━━❖✡️❖━━━━━╯`;
+
+    return message.reply(textInfo);
+  }
 };
