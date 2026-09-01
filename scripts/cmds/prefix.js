@@ -1,22 +1,11 @@
 const fs = require("fs-extra");
 const moment = require("moment-timezone");
 
-const getStreamFromURL = global.utils.getStreamFromURL;
-
-// ✅ VIDEO + IMAGE SUPPORT (both work)
-const mediaList = [
-  "https://files.catbox.moe/apl9z8.jpg",
-  "https://files.catbox.moe/o2ocsw.jpg"
-];
-
-// ✅ per-thread toggle storage
-global.GoatBot.prefixVideoToggle = global.GoatBot.prefixVideoToggle || {};
-
 module.exports = {
   config: {
     name: "prefix",
-    version: "2.6",
-    author: "FARHAN-KHAN",
+    version: "2.7.0",
+    author: "FARHAN-KHAN / SIFAT",
     countDown: 5,
     role: 0,
     description: "Change & show bot prefix",
@@ -51,14 +40,12 @@ module.exports = {
     if (setGlobal && role < 2)
       return message.reply(getLang("onlyAdmin"));
 
-    const media = await getStreamFromURL(mediaList[0]);
-
     const confirmMsg = setGlobal
       ? getLang("confirmGlobal")
       : getLang("confirmThisThread");
 
     message.reply(
-      { body: confirmMsg, attachment: media },
+      confirmMsg,
       (err, info) => {
         if (err) return;
 
@@ -102,14 +89,6 @@ module.exports = {
 
     const threadID = event.threadID;
 
-    if (global.GoatBot.prefixVideoToggle[threadID] === undefined)
-      global.GoatBot.prefixVideoToggle[threadID] = 0;
-
-    const index = global.GoatBot.prefixVideoToggle[threadID];
-    global.GoatBot.prefixVideoToggle[threadID] = index === 0 ? 1 : 0;
-
-    const media = await getStreamFromURL(mediaList[index]);
-
     const systemPrefix = global.GoatBot.config.prefix;
     const groupPrefix = global.utils.getPrefix(threadID);
 
@@ -119,9 +98,9 @@ module.exports = {
     const time = moment().tz("Asia/Dhaka").format("hh:mm A");
     const date = moment().tz("Asia/Dhaka").format("DD MMM YYYY");
 
-    const owner = "𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
+    const owner = "𝐒𝐈𝐅𝐀𝐓 𝐀𝐇𝐌𝐄𝐃";
 
-    const design1 = `╭👑 𝐏𝐑𝐄𝐅𝐈𝐗 𝐏𝐀𝐍𝐄𝐋 👑 ╮
+    const design = `╭👑 𝐏𝐑𝐄𝐅𝐈𝐗 𝐏𝐀𝐍𝐄𝐋 👑 ╮
 🏷️ 𝐆𝐑𝐎𝐔𝐏 ➜ ${groupName}
 🔰 𝐒𝐘𝐒𝐓𝐄𝐌 ➜ ${systemPrefix}
 💬 𝐏𝐑𝐄𝐅𝐈𝐗 ➜ ${groupPrefix}
@@ -131,24 +110,8 @@ module.exports = {
 📊 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 ➜ 6086+
 🚀 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ➜ V2 • V3 • V5
 ⚡ 𝐒𝐓𝐀𝐓𝐔𝐒 ➜ ONLINE
-〔 💎𝐍𝐈𝐉𝐇𝐔𝐌 𝐁𝐎𝐓💎 〕`;
+_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡`;
 
-    const design2 = `◢◤◢◤◢◤◢◤◢◤◢◤◢◤
-🔥 𝐏𝐑𝐄𝐅𝐈𝐗 𝐏𝐀𝐍𝐄𝐋 🔥
-➥ 👥 𝐆𝐑𝐎𝐔𝐏 :: ${groupName}
-➥ ⚙️ 𝐒𝐘𝐒𝐓𝐄𝐌 :: ${systemPrefix}
-➥ 💬 𝐏𝐑𝐄𝐅𝐈𝐗 :: ${groupPrefix}
-➥ ⏰ 𝐓𝐈𝐌𝐄 :: ${time}
-➥ 📆 𝐃𝐀𝐓𝐄 :: ${date}
-➥ 👑 𝐎𝐖𝐍𝐄𝐑 :: ${owner}
-➥ 📊 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 :: 6086+
-➥ 🚀 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 :: V2 • V3 • V5
-➥ ⚡ 𝐒𝐓𝐀𝐓𝐔𝐒 :: ONLINE
-💎𝐒𝐈𝐘𝐀𝐌 𝐄𝐌𝐏𝐈𝐑𝐄💎`;
-
-    return message.reply({
-      body: index === 0 ? design1 : design2,
-      attachment: media
-    });
+    return message.reply(design);
   }
 };
