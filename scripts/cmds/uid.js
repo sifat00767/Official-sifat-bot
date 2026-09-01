@@ -1,150 +1,189 @@
-const axios = require("axios");
-const { createCanvas, loadImage } = require("canvas");
 const fs = require("fs-extra");
 const path = require("path");
+const axios = require("axios");
+const { createCanvas, loadImage } = require("canvas");
 
 module.exports = {
   config: {
     name: "uid",
-    version: "7.1.0",
-    author: "𝐒𝐈𝐅𝐀𝐓",
-    countDown: 3,
+    version: "2.5.0",
+    author: "MR_FARHAN",
+    countDown: 5,
     role: 0,
     shortDescription: {
-      en: "Get user UID with a clean premium card",
-      bn: "ক্লিন প্রিমিয়াম কার্ড সহ ইউআইডি দেখুন"
+      en: "Get user's UID and Stylist Banner"
     },
     longDescription: {
-      en: "Displays UID text message along with a clean premium styled image card.",
-      bn: "মেসেজে ইউআইডি টেক্সট এবং সাথে ক্লিন প্রিমিয়াম ইমেজ কার্ড পাঠায়।"
+      en: "Generates an advanced Cool style banner (1200x500) with User ID and Avatar."
     },
     category: "info",
     guide: {
-      en: "{p}uid or {p}uid @mention",
-      bn: "{p}uid অথবা {p}uid @মেনশন"
+      en: "{pn} [mention | reply | leave blank]"
     }
   },
 
-  onStart: async function ({ api, event, args, usersData, message }) {
+  onStart: async function ({ api, event, args, usersData }) {
+    const { threadID, messageID, senderID, type, messageReply, mentions } = event;
+    const cachePath = path.join(__dirname, "cache", `uid_${Date.now()}.png`);
+
+    // 1. Find Target User ID
+    let targetID = senderID;
+    if (type === "message_reply") {
+      targetID = messageReply.senderID;
+    } else if (Object.keys(mentions).length > 0) {
+      targetID = Object.keys(mentions)[0];
+    } else if (args.length > 0) {
+      if (!isNaN(args[0])) {
+        targetID = args[0];
+      }
+    }
+
+    // Send processing message
+    const processMsg = await api.sendMessage("-ˋˏ✄━═━═━═", threadID);
+
     try {
-      let targetID = event.senderID;
+      // 2. Fetch User Data
+      const userData = await usersData.get(targetID);
+      const name = userData.name || "Unknown User";
 
-      // ১. রিপ্লাই চেক
-      if (event.type === "message_reply" && event.messageReply?.senderID) {
-        targetID = event.messageReply.senderID;
-      }
-      // ২. মেনশন চেক
-      else if (event.mentions && Object.keys(event.mentions).length > 0) {
-        targetID = Object.keys(event.mentions)[0];
-      }
-
-      // টার্গেট ইউজারের সঠিক নাম ফেচ করা
-      let userName = "Facebook User";
-      try {
-        const userInfo = await usersData.get(targetID);
-        userName = userInfo?.name || (await usersData.getName(targetID));
-      } catch (e) {
-        userName = "Facebook User";
-      }
-
-      const avatarUrl = `https://graph.facebook.com/${targetID}/picture?height=500&width=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
-
-      // ক্যানভাস সাইজ (550x200)
-      const canvas = createCanvas(550, 200);
+      // 3. Setup Canvas (1200x500 - High Quality HD Banner)
+      const width = 1200;
+      const height = 500;
+      const canvas = createCanvas(width, height);
       const ctx = canvas.getContext("2d");
 
       ctx.antialias = "subpixel";
 
-      // ডার্ক প্রিমিয়াম মেটালিক ব্যাকগ্রাউন্ড
-      const bgGradient = ctx.createLinearGradient(0, 0, 550, 200);
-      bgGradient.addColorStop(0, "#0a0b10");
-      bgGradient.addColorStop(0.5, "#141622");
-      bgGradient.addColorStop(1, "#0a0b10");
+      // --- HIGH QUALITY GRADIENT BACKGROUND ---
+      const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+      bgGradient.addColorStop(0, "#090a16");
+      bgGradient.addColorStop(0.5, "#101428");
+      bgGradient.addColorStop(1, "#070811");
       ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, 550, 200);
+      ctx.fillRect(0, 0, width, height);
 
-      // নিওন সাইড বর্ডার
+      // Glassmorphism Box Overlay
+      ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.beginPath();
+      ctx.roundRect(30, 30, width - 60, height - 60, 24);
+      ctx.fill();
+
+      // Neon Outer Borders
       ctx.strokeStyle = "#00f2fe";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(8, 8, 534, 184);
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(30, 30, width - 60, height - 60, 24);
+      ctx.stroke();
 
-      ctx.strokeStyle = "#7f00ff";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(12, 12, 526, 176);
+      ctx.strokeStyle = "#ff007f";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(40, 40, width - 80, height - 80, 18);
+      ctx.stroke();
 
-      // হেক্সাগন ড্র করার ফাংশন
-      function drawHexagon(x, y, r) {
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI / 3) * i;
-          const hx = x + r * Math.cos(angle);
-          const hy = y + r * Math.sin(angle);
-          if (i === 0) ctx.moveTo(hx, hy);
-          else ctx.lineTo(hx, hy);
-        }
-        ctx.closePath();
-      }
+      // --- AVATAR HANDLING ---
+      const avatarUrl = `https://graph.facebook.com/${targetID}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-      // প্রোফাইল পিকচার (হেক্সাগন ফ্রেমে ক্রপ করা)
+      let avatarBuffer;
       try {
-        const avatarImage = await loadImage(avatarUrl);
-        ctx.save();
-        drawHexagon(95, 100, 55);
-        ctx.clip();
-        ctx.drawImage(avatarImage, 40, 45, 110, 110);
-        ctx.restore();
-
-        // হেক্সাগনের চারপাশে শার্প নিওন রিং
-        drawHexagon(95, 100, 57);
-        ctx.strokeStyle = "#00f2fe";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
+        const response = await axios.get(avatarUrl, { responseType: "arraybuffer" });
+        avatarBuffer = response.data;
       } catch (e) {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(40, 45, 110, 110);
+        const fallbackUrl = `https://graph.facebook.com/${targetID}/picture?type=large`;
+        const response = await axios.get(fallbackUrl, { responseType: "arraybuffer" });
+        avatarBuffer = response.data;
       }
 
-      // ১. নাম
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 20px sans-serif";
-      const displayName = userName.length > 18 ? userName.substring(0, 18) + "..." : userName;
-      ctx.fillText(`NAME : ${displayName}`, 180, 65);
+      const avatarImg = await loadImage(avatarBuffer);
 
-      // ২. ইউআইডি
+      // Circle Avatar with Neon Glow (Scaled up for 1200x500)
+      const avatarX = 230;
+      const avatarY = 250;
+      const radius = 135;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(avatarX, avatarY, radius + 6, 0, Math.PI * 2);
+      ctx.strokeStyle = "#00f2fe";
+      ctx.lineWidth = 6;
+      ctx.shadowColor = "#00f2fe";
+      ctx.shadowBlur = 25;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(avatarX, avatarY, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(avatarImg, avatarX - radius, avatarY - radius, radius * 2, radius * 2);
+      ctx.restore();
+
+      // --- TEXT DETAILS (RIGHT SIDE) ---
+      const textStartX = 430;
+
+      // NAME
       ctx.fillStyle = "#ff007f";
-      ctx.font = "bold 18px sans-serif";
-      ctx.fillText(`UID  : ${targetID}`, 180, 105);
+      ctx.font = "bold 36px sans-serif";
+      ctx.fillText("NAME", textStartX, 170);
 
-      // ৩. ডিভাইডার লাইন
-      ctx.fillStyle = "rgba(0, 242, 254, 0.4)";
-      ctx.fillRect(180, 123, 330, 1.5);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 42px sans-serif";
+      ctx.shadowColor = "rgba(255, 255, 255, 0.4)";
+      ctx.shadowBlur = 12;
+      ctx.fillText(`: ${name}`, textStartX + 130, 170);
+      ctx.shadowBlur = 0;
 
-      // ৪. ব্র্যান্ডিং
+      // UID
       ctx.fillStyle = "#00f2fe";
-      ctx.font = "italic bold 13px sans-serif";
-      ctx.fillText("⚡powerd by : Sifat Ahmed", 180, 150);
+      ctx.font = "bold 36px sans-serif";
+      ctx.fillText("UID", textStartX, 270);
 
-      // ক্যাশে ফাইল সেভ
-      const cachePath = path.join(__dirname, `cache/uid_${targetID}.png`);
-      fs.ensureDirSync(path.join(__dirname, "cache"));
+      ctx.fillStyle = "#00f2fe";
+      ctx.font = "bold 40px sans-serif";
+      ctx.shadowColor = "#00f2fe";
+      ctx.shadowBlur = 15;
+      ctx.fillText(`: ${targetID}`, textStartX + 130, 270);
+      ctx.shadowBlur = 0;
 
+      // Separator Line
+      ctx.fillStyle = "rgba(0, 242, 254, 0.4)";
+      ctx.fillRect(textStartX, 330, 680, 3);
+
+      // Branding (Powerd by)
+      ctx.fillStyle = "#ff007f";
+      ctx.font = "bold 26px sans-serif";
+      ctx.fillText("⚡ powerd by :", textStartX, 395);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "italic bold 26px sans-serif";
+      ctx.fillText("Sifat Ahmed", textStartX + 220, 395);
+
+      // --- SAVE & SEND ---
       const buffer = canvas.toBuffer("image/png");
+      fs.ensureDirSync(path.join(__dirname, "cache"));
       fs.writeFileSync(cachePath, buffer);
 
-      // চ্যাটে বডি মেসেজে সঠিক টার্গেট আইডি ও পিকচার যাবে
-      return message.reply(
+      // Unsend processing message
+      api.unsendMessage(processMsg.messageID);
+
+      // Send Result
+      return api.sendMessage(
         {
-          body: `UID: ${targetID}`,
+          body: `🆔 UID: ${targetID}`,
           attachment: fs.createReadStream(cachePath)
         },
+        threadID,
         () => {
           if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
-        }
+        },
+        messageID
       );
 
     } catch (error) {
       console.error(error);
-      return message.reply("⚠️ ইউআইডি কার্ড তৈরি করতে সমস্যা হয়েছে!");
+      api.unsendMessage(processMsg.messageID);
+      return api.sendMessage("❌ Error generating image: " + error.message, threadID, messageID);
     }
   }
 };
