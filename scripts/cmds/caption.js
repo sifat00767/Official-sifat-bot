@@ -372,7 +372,7 @@ ___আমার গল্প শেষ...?🥹😅😭`,
       } catch {}
 
       return api.sendMessage(
-`_⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕
+`_⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡
 
 ${randomCaption}`,
         event.threadID
