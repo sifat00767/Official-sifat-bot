@@ -7,176 +7,141 @@ const VISIBLE_AUTHOR = "𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
 let designIndex = 0;
 
 module.exports = {
-config: {
-name: "join",
-version: "1.2.0",
-author: VISIBLE_AUTHOR,
-countDown: 5,
-role: 2,
-description: "Get all group list and join by serial number",
-category: "System",
-guide: {
-en: "{pn}"
-}
-},
+  config: {
+    name: "join",
+    version: "1.4.0",
+    author: VISIBLE_AUTHOR,
+    countDown: 5,
+    role: 2, // 2 = Only Bot Admin
+    description: "Get all active group list and join by serial number",
+    category: "System",
+    guide: {
+      en: "{pn}"
+    }
+  },
 
-/* --- [ 🔐 FILE_CREATOR_INFORMATION ] ---
+  onStart: async function ({ api, event, threadsData, message }) {
+    if (VISIBLE_AUTHOR !== AUTHOR_LOCK) {
+      return message.reply("⚠️ Author Lock Changed! File Locked.");
+    }
 
-🤖 BOT NAME: SIYAM BOT
-👤 OWNER: 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
-📍 LOCATION: BANGLADESH
+    const { threadID, messageID, senderID } = event;
 
---------------------------------------- */
+    try {
+      // 1. Get all threads from database
+      const allThreads = await threadsData.getAll();
+      const botID = api.getCurrentUserID();
 
-onStart: async function ({ api, event }) {
+      // 2. Filter ONLY groups where the bot is currently an active member
+      const activeGroupList = [];
 
-if (VISIBLE_AUTHOR !== AUTHOR_LOCK) {
-return api.sendMessage("⚠️ Author Lock Changed! File Locked.", event.threadID);
-}
+      for (const thread of allThreads) {
+        if (!thread.isGroup || !thread.threadID) continue;
 
-const { threadID, messageID } = event;
+        // Check if members data exists and if bot's ID is still in members list
+        const members = thread.members || [];
+        const isBotInGroup = members.some(m => (m.userID || m.id) === botID && m.inGroup !== false);
 
-try {
+        // If thread status is active and bot is in group, add to list
+        if (thread.status === true || isBotInGroup) {
+          activeGroupList.push(thread);
+        }
+      }
 
-const allThreads = await api.getThreadList(20, null, ["INBOX"]) || [];
-const groupList = allThreads.filter(t => t.isGroup && t.isSubscribed);
+      if (!activeGroupList || activeGroupList.length === 0) {
+        return message.reply("❌ মামা, বট বর্তমানে যেসব গ্রুপে যুক্ত আছে তার কোনো তথ্য পাওয়া যায়নি।");
+      }
 
-if (!groupList || groupList.length === 0) {
-return api.sendMessage("❌ মামা, বটের কাছে কোনো সচল গ্রুপের তথ্য পাওয়া যায়নি।", threadID, messageID);
-}
+      const designs = [
+        (groupList) => {
+          let text = `📜 𝐆𝐫𝐨𝐮𝐩 𝐋𝐢𝐬𝐭 📜\n━━━━━━━━━━━━━━━━━\n`;
+          groupList.forEach((group, index) => {
+            const threadInfo = group.threadInfo || {};
+            text += `${index + 1}. ${threadInfo.threadName || group.threadName || "Unknown Group"}\n`;
+          });
+          text += `\n━━━━━━━━━━━━━━━━━\n👉 যে গ্রুপে জয়েন হতে চান, সেই সিরিয়াল নাম্বারটি লিখে রিপ্লাই দিন।`;
+          return text;
+        },
 
-const designs = [
+        (groupList) => {
+          let text = `╭─❖ 𝐕𝐈𝐏 𝐆𝐑𝐎𝐔𝐏 𝐋𝐈𝐒𝐓 ❖─╮\n\n`;
+          groupList.forEach((group, index) => {
+            const threadInfo = group.threadInfo || {};
+            text += `┃ ${index + 1} ➤ ${threadInfo.threadName || group.threadName || "Unknown Group"}\n`;
+          });
+          text += `\n╰────────❖────────╯\n👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑\n👑 ${VISIBLE_AUTHOR} 👑\n\n🪬 যে গ্রুপে জয়েন হতে চান,\n🔢 সেই নাম্বারটি রিপ্লাই দিন。\n╰────────❖────────╯`;
+          return text;
+        },
 
-(groupList) => {
-let text = `📜 𝐆𝐫𝐨𝐮𝐩 𝐋𝐢𝐬𝐭 📜
-━━━━━━━━━━━━━━━━━\n`;
+        (groupList) => {
+          let text = `┏❖💠 𝐆𝐑𝐎𝐔𝐏 𝐏𝐀𝐍𝐄𝐋 💠❖┓\n`;
+          groupList.forEach((group, index) => {
+            const threadInfo = group.threadInfo || {};
+            text += ` 〔 ${index + 1} 〕${threadInfo.threadName || group.threadName || "Unknown Group"}\n`;
+          });
+          text += `\n┗━━❖━━━━━━━━━❖━━┛\n👑 𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑\n👑 ${VISIBLE_AUTHOR} 👑\n\n👉 যে গ্রুপে জয়েন হতে চান, সেই নাম্বারটি রিপ্লাই দিন।\n┗━━❖━━━ ━━━ ━━━❖━━┛`;
+          return text;
+        }
+      ];
 
-groupList.forEach((group, index) => {
-text += `${index + 1}. ${group.name || "Unknown Group"}\n`;
-});
+      const msg = designs[designIndex](activeGroupList);
 
-text += `\n━━━━━━━━━━━━━━━━━
-👉 যে গ্রুপে জয়েন হতে চান, সেই সিরিয়াল নাম্বারটি লিখে রিপ্লাই দিন。`;
+      designIndex++;
+      if (designIndex >= designs.length) {
+        designIndex = 0;
+      }
 
-return text;
-},
+      return message.reply(msg, (err, info) => {
+        if (err) return console.error(err);
 
-(groupList) => {
-let text = `╭─❖𝐕𝐈𝐏 𝐆𝐑𝐎𝐔𝐏 𝐋𝐈𝐒𝐓 ❖─╮\n\n`;
+        global.GoatBot.onReply.set(info.messageID, {
+          commandName: this.config.name,
+          messageID: info.messageID,
+          author: senderID,
+          groupList: activeGroupList.map(g => ({
+            threadID: g.threadID,
+            name: (g.threadInfo ? g.threadInfo.threadName : g.threadName) || "Group"
+          }))
+        });
+      });
 
-groupList.forEach((group, index) => {
-text += `┃ ${index + 1} ➤ ${group.name || "Unknown Group"}\n`;
-});
+    } catch (e) {
+      console.error(e);
+      return message.reply("❌ এরর: গ্রুপের লিস্ট পাওয়া যাচ্ছে না। কিছুক্ষণ পর ট্রাই করো।");
+    }
+  },
 
-text += `\n╰────────❖────────╯
-👑𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑
-👑 ${VISIBLE_AUTHOR} 👑
+  onReply: async function ({ api, event, Reply, message }) {
+    const { threadID, messageID, body, senderID } = event;
+    const { author, groupList } = Reply;
 
-🪬 যে গ্রুপে জয়েন হতে চান,
-🔢 সেই নাম্বারটি রিপ্লাই দিন।
-╰────────❖────────╯`;
+    if (author !== senderID) return;
 
-return text;
-},
+    const index = parseInt(body) - 1;
 
-(groupList) => {
-let text = `┏❖💠𝐆𝐑𝐎𝐔𝐏 𝐏𝐀𝐍𝐄𝐋 💠❖┓\n`;
+    if (isNaN(body) || index < 0 || !groupList[index]) {
+      return message.reply("❌ মামা, ভুল সিরিয়াল নাম্বার দিয়েছেন। সঠিক নাম্বার লিখে রিপ্লাই দিন।");
+    }
 
-groupList.forEach((group, index) => {
-text += ` 〔 ${index + 1} 〕${group.name || "Unknown Group"}\n`;
-});
+    const targetGroup = groupList[index];
+    const targetThreadID = targetGroup.threadID;
 
-text += `\n┗━━❖━━━━━━━━━❖━━┛
-👑𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥 👑
-👑 ${VISIBLE_AUTHOR} 👑
+    try {
+      await api.addUserToGroup(senderID, targetThreadID);
 
-👉যে গ্রুপে জয়েন হতে চান, সেই নাম্বারটি রিপ্লাই দিন।
-┗━━❖━━━ ━━━ ━━━❖━━┛`;
+      message.reply(`✅ সাকসেস! আপনাকে "${targetGroup.name || "ঐ গ্রুপে"}" অ্যাড করা হয়েছে।`);
 
-return text;
-}
+      api.sendMessage(
+        `🔔 ${VISIBLE_AUTHOR} এই গ্রুপে জয়েন করেছেন।`,
+        targetThreadID
+      );
 
-];
+    } catch (err) {
+      message.reply(
+        `❌ মামা অ্যাড করা যাচ্ছে না। হয়তো আপনি অলরেডি গ্রুপে আছেন বা বট ঐ গ্রুপের এডমিন না।\nGroup ID: ${targetThreadID}`
+      );
+    }
 
-const msg = designs[designIndex](groupList);
-
-designIndex++;
-if (designIndex >= designs.length) {
-designIndex = 0;
-}
-
-return api.sendMessage(msg, threadID, (err, info) => {
-
-if (err) return console.log(err);
-
-global.GoatBot.onReply.set(info.messageID, {
-commandName: this.config.name,
-messageID: info.messageID,
-author: event.senderID,
-groupList
-});
-
-}, messageID);
-
-} catch (e) {
-
-return api.sendMessage(
-"❌ এরর: গ্রুপের লিস্ট পাওয়া যাচ্ছে না। কিছুক্ষণ পর ট্রাই করো।",
-threadID,
-messageID
-);
-
-}
-
-},
-
-onReply: async function ({ api, event, Reply }) {
-
-const { threadID, messageID, body, senderID } = event;
-const { author, groupList } = Reply;
-
-if (author !== senderID) return;
-
-const index = parseInt(body) - 1;
-
-if (isNaN(body) || index < 0 || !groupList[index]) {
-return api.sendMessage(
-"❌ মামা, ভুল সিরিয়াল নাম্বার দিয়েছেন। সঠিক নাম্বার লিখে রিপ্লাই দিন।",
-threadID,
-messageID
-);
-}
-
-const targetGroup = groupList[index];
-const targetThreadID = targetGroup.threadID;
-
-try {
-
-await api.addUserToGroup(senderID, targetThreadID);
-
-api.sendMessage(
-`✅ সাকসেস! আপনাকে "${targetGroup.name || "ঐ গ্রুপে"}" অ্যাড করা হয়েছে।`,
-threadID,
-messageID
-);
-
-api.sendMessage(
-`🔔 ${VISIBLE_AUTHOR} এই গ্রুপে জয়েন করেছেন।`,
-targetThreadID
-);
-
-} catch (err) {
-
-api.sendMessage(
-`❌ মামা অ্যাড করা যাচ্ছে না। হয়তো আপনি অলরেডি গ্রুপে আছেন বা বট এডমিন না।\nGroup ID: ${targetThreadID}`,
-threadID,
-messageID
-);
-
-}
-
-global.GoatBot.onReply.delete(Reply.messageID);
-
-}
-
+    global.GoatBot.onReply.delete(Reply.messageID);
+  }
 };
