@@ -5,7 +5,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: "resend",
-    version: "2.2.0",
+    version: "2.3.0",
     author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 0,
     role: 0,
@@ -14,8 +14,8 @@ module.exports = {
       bn: "আনসেন্ড করা মেসেজ পুনরায় পাঠায়"
     },
     longDescription: {
-      en: "Detects un-sent/deleted messages and resends them with attachment support. Includes group and global toggles.",
-      bn: "কেউ মেসেজ আনসেন্ড করলে তা চিহ্নিত করে পিকচার/ভিডিও সহ আবার চ্যাটে পাঠিয়ে দেয়।"
+      en: "Detects un-sent/deleted messages and resends them with attachment support. Status is permanently stored in database.",
+      bn: "কেউ মেসেজ আনসেন্ড করলে তা চিহ্নিত করে পিকচার/ভিডিও সহ আবার চ্যাটে পাঠিয়ে দেয়। বট রিস্টার্ট হলেও ডাটাবেসে অন/অফ সেভ থাকবে।"
     },
     category: "events",
     guide: {
@@ -77,7 +77,7 @@ module.exports = {
           return message.reply(
             "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
             "───────────────\n" +
-            "» 🛡️ _⁠-𝑹𝒆𝒔𝒆𝒏𝒅 𝑨𝒍𝒍 𝑬𝒏𝒂𝒃𝒍𝒆𝒅\n" +
+            "» 🛡️ _⁠-𝑹𝒆𝒔𝒆𝒏𝒅 𝑨𝒍𝒍 𝑬𝒏𝒂𝒃𝒍𝑬𝑫\n" +
             "» 🚀 বটের সমস্ত গ্রুপে রিসেন্ড সার্ভিস অন করা হলো!\n" +
             "───────────────\n" +
             "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
@@ -98,13 +98,13 @@ module.exports = {
         }
       }
 
-      // Specific Thread Toggle (On or Off)
+      // Specific Thread Toggle (Only for current thread)
       if (subCommand === "on" || subCommand === "অন") {
         await threadsData.set(threadID, true, "data.resendStatus");
         return message.reply(
           "» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n" +
           "───────────────\n" +
-          "» 🛡️ _⁠-𝑹𝒆𝒔𝒆𝒏𝒅 𝑬𝒏𝒂𝒃𝒍𝒆𝒅\n" +
+          "» 🛡️ _⁠-𝑹𝒆𝒔𝒆𝒏𝒅 𝑬𝒏𝒂𝒃𝒍𝑬𝑫\n" +
           "» ✨ এই গ্রুপের জন্য রিসেন্ড সার্ভিস অন করা হয়েছে!\n" +
           "───────────────\n" +
           "» _⁠-𝑵𝒊𝒋𝒉𝒖𝒎 𝑪𝒉𝒂𝒕𝑩𝒐𝒕"
@@ -141,7 +141,7 @@ module.exports = {
       global.resendMessageCache = new Map();
     }
 
-    // চ্যাট বার্তাগুলো সাময়িকভাবে ক্যাশে সেভ করে রাখা
+    // চ্যাট বার্তাগুলো সাময়িকভাবে মেমোরি ক্যাশে সেভ করা
     if (type === "message" || type === "message_reply") {
       global.resendMessageCache.set(messageID, {
         body: event.body,
@@ -152,7 +152,7 @@ module.exports = {
 
     // আনসেন্ড বা মেসেজ রিমুভ ইভেন্ট ধরা
     if (type === "message_unsend") {
-      // Strict Check: স্ট্যাটাস যদি পুরোপুরি true না হয় (false বা undefined), তবে কাজ করবে না
+      // Strict Database Check (ডাটাবেসে ট্রু না থাকলে কাজ করবে না)
       const resendStatus = await threadsData.get(threadID, "data.resendStatus");
       if (resendStatus !== true) return;
 
@@ -165,13 +165,15 @@ module.exports = {
       let msgText = `❀──────তোমরা কে কোথায় আছো দেখো ${name} মেসেজ ডিলিট করেছেন ${deletedMsg}\n\n😎😏`;
 
       const attachments = [];
+      const cacheDir = path.join(__dirname, "cache");
+      if (!fs.existsSync(cacheDir)) fs.ensureDirSync(cacheDir);
 
-      // পিকচার/ভিডিও/অডিও ইত্যাদি ডাউনলোড করে হ্যান্ডেল করা
+      // পিকচার/ভিডিও/অডিও ডাউনলোড
       if (getMsgData.attachments && getMsgData.attachments.length > 0) {
         for (let i = 0; i < getMsgData.attachments.length; i++) {
           const item = getMsgData.attachments[i];
           const ext = item.type === "photo" ? "jpg" : item.type === "video" ? "mp4" : item.type === "audio" ? "mp3" : "bin";
-          const filePath = path.join(__dirname, `cache/resend_${messageID}_${i}.${ext}`);
+          const filePath = path.join(cacheDir, `resend_${messageID}_${i}.${ext}`);
 
           try {
             const response = await axios.get(item.url, { responseType: "arraybuffer" });
@@ -183,15 +185,16 @@ module.exports = {
         }
       }
 
-      // মেসেজ ব্যাক পাঠানো
+      // মেসেজ ব্যাক পাঠানো ও ফাইল ক্লিনআপ
       api.sendMessage({ body: msgText, attachment: attachments }, threadID, () => {
-        // ফাইল ক্যাশ ক্লিয়ার করা
-        for (let i = 0; i < getMsgData.attachments.length; i++) {
-          const item = getMsgData.attachments[i];
-          const ext = item.type === "photo" ? "jpg" : item.type === "video" ? "mp4" : item.type === "audio" ? "mp3" : "bin";
-          const filePath = path.join(__dirname, `cache/resend_${messageID}_${i}.${ext}`);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+        if (getMsgData.attachments && getMsgData.attachments.length > 0) {
+          for (let i = 0; i < getMsgData.attachments.length; i++) {
+            const item = getMsgData.attachments[i];
+            const ext = item.type === "photo" ? "jpg" : item.type === "video" ? "mp4" : item.type === "audio" ? "mp3" : "bin";
+            const filePath = path.join(cacheDir, `resend_${messageID}_${i}.${ext}`);
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
           }
         }
       });
