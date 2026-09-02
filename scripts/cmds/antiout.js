@@ -5,7 +5,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: "antiout",
-    version: "2.6.0",
+    version: "2.7.0",
     author: "𝐒𝐈𝐅𝐀𝐓",
     countDown: 0,
     role: 0,
@@ -14,8 +14,8 @@ module.exports = {
       bn: "গ্রুপ থেকে কেউ লিভ নিলে তাকে অটো রি-এড করে"
     },
     longDescription: {
-      en: "Automatically adds back members who leave the group. Re-add status can be toggled per group or globally for all groups. If a user leaves twice, they won't be re-added.",
-      bn: "কেউ লিভ নিলে সাথে সাথে আবার গ্রুপে এড করে দেবে। যদি কোনো ইউজার রি-এড করার পর আবার লিভ নেয়, তবে বট তাকে আর এড না দিয়ে বিদায় মেসেজ দেবে।"
+      en: "Automatically adds back members who leave the group. Re-add status is saved permanently in database.",
+      bn: "কেউ লিভ নিলে সাথে সাথে আবার গ্রুপে এড করে দেবে। বট রিস্টার্ট বা অফ হলেও ডাটাবেসে সেভ থাকবে।"
     },
     category: "events",
     guide: {
@@ -27,12 +27,6 @@ module.exports = {
     vi: {},
     en: {},
     bn: {}
-  },
-
-  onLoad: async function () {
-    if (!global.antioutReaddCache) {
-      global.antioutReaddCache = new Map();
-    }
   },
 
   onStart: async function ({ api, event, args, role, threadsData, message }) {
@@ -98,7 +92,7 @@ module.exports = {
         }
       }
 
-      // Specific Thread Toggle (On or Off)
+      // Specific Thread Toggle (Only for current thread)
       if (subCommand === "on" || subCommand === "অন") {
         await threadsData.set(threadID, true, "data.antioutStatus");
         return message.reply(
@@ -139,22 +133,20 @@ module.exports = {
       const { threadID, logMessageData } = event;
       const leftUserID = logMessageData.leftParticipantFbId;
 
-      // Strict Antiout Status Check (কেবলমাত্র true হলেই কাজ করবে)
+      // Strict Antiout Status Check (ডাটাবেস থেকে অন কিনা চেক করবে)
       const antioutStatus = await threadsData.get(threadID, "data.antioutStatus");
       if (antioutStatus !== true) return;
 
-      // যদি বট নিজেই বের হয়ে যায় বা কিক খায় তবে কাজ করবে না
+      // বট নিজে লিভ নিলে কাজ করবে না
       if (leftUserID === api.getCurrentUserID()) return;
 
-      if (!global.antioutReaddCache) {
-        global.antioutReaddCache = new Map();
-      }
-
-      const userKey = `${threadID}_${leftUserID}`;
       const name = await usersData.getName(leftUserID);
 
-      // ২য় বার লিভ নিয়েছে কিনা চেক
-      if (global.antioutReaddCache.get(userKey)) {
+      // ডাটাবেস থেকে ইউজারদের Re-add ট্র্যাকিং হিস্ট্রি নেওয়া
+      const readdList = (await threadsData.get(threadID, "data.antioutReaddList")) || [];
+
+      // ২য় বার লিভ নিয়েছে কিনা ডাটাবেস চেক
+      if (readdList.includes(leftUserID)) {
         api.sendMessage(
           `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
           `───────────────\n` +
@@ -168,10 +160,13 @@ module.exports = {
         return;
       }
 
-      // ১ম বার লিভ নিলে অটো রি-এড সিস্টেম
+      // ১ম বার লিভ নিলে অটো রি-এড এবং ডাটাবেসে সেভ
       try {
         await api.addUserToGroup(leftUserID, threadID);
-        global.antioutReaddCache.set(userKey, true); // ট্র্যাকিং অন
+
+        // ডাটাবেসে ইউজারের আইডি যুক্ত করে সেভ করা (যাতে বট অফ হলেও ডাটা থাকে)
+        readdList.push(leftUserID);
+        await threadsData.set(threadID, readdList, "data.antioutReaddList");
 
         api.sendMessage(
           `» _⁠-𝑨𝒅𝒎𝒊𝒏 𝑺𝒊𝒇𝒂𝒕 𝑺𝒊𝒓 ♡\n` +
